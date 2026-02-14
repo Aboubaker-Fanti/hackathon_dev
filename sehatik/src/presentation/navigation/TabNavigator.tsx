@@ -20,6 +20,7 @@ import { ProfileScreen } from '../screens/Profile/ProfileScreen';
 import { ScreeningCentersScreen } from '../screens/ScreeningCenters/ScreeningCentersScreen';
 import { NearbySearchScreen } from '../screens/NearbySearch/NearbySearchScreen';
 import { useLanguageStore } from '../../application/store/languageStore';
+import { useSelfCheckStore } from '../../application/store/selfCheckStore';
 import { MIN_TOUCH_TARGET } from '../theme/spacing';
 
 export type TabParamList = {
@@ -79,6 +80,25 @@ const ProfileTabScreen: React.FC = () => {
 };
 
 /**
+ * Wrapper for Autopalpation tab — hides the bottom tab bar
+ * when the self-check flow is active (instructions, chat, or results).
+ */
+const AutopalpationTabWrapper: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const { isActive, result } = useSelfCheckStore();
+  const isInFlow = isActive || !!result;
+
+  React.useEffect(() => {
+    navigation.setOptions({
+      tabBarStyle: isInFlow
+        ? { display: 'none' as const }
+        : styles.tabBar,
+    });
+  }, [isInFlow, navigation]);
+
+  return <SelfCheckScreen />;
+};
+
+/**
  * Wrapper for Home tab with navigation props
  */
 const HomeTabWrapper: React.FC<{ navigation: any }> = ({ navigation }) => {
@@ -134,7 +154,7 @@ export const TabNavigator: React.FC = () => {
       />
       <Tab.Screen
         name="Autopalpation"
-        component={SelfCheckScreen}
+        component={AutopalpationTabWrapper}
         options={{ tabBarLabel: t('tabs.autopalpation') }}
       />
       <Tab.Screen

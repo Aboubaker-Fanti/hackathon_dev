@@ -1,10 +1,13 @@
 /**
- * Autopalpation Screen — Premium 2026 Exam Flow
- * Multi-step guided breast self-examination with modern card-based UI.
- * Glassmorphism, warm gradients, fluid interactions, generous whitespace.
+ * Autopalpation Screen — Premium 2026 Design Overhaul
+ * * Features:
+ * - Floating Card UI Architecture
+ * - Soft "Calm" Gradients & Glass-like overlays
+ * - Haptic-style visual feedback
+ * - Fluid Layout Animations
  */
 
-import React, { useRef, useCallback, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -13,320 +16,384 @@ import {
   ScrollView,
   Platform,
   Animated,
+  LayoutAnimation,
+  UIManager,
+  Dimensions,
+  StatusBar,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+
+// --- Internal Imports (Preserved) ---
 import { MedicalDisclaimer } from '../../components/common/MedicalDisclaimer';
 import { useLanguageStore } from '../../../application/store/languageStore';
 import { useExamStore } from '../../../application/store/examStore';
 import { EXAM_SECTIONS, shouldShowQuestion } from '../../../infrastructure/data/examQuestions';
-import { getRiskColor, getRiskIcon } from '../../../domain/services/riskAssessment';
-import { colors } from '../../theme/colors';
-import { spacing, borderRadius, MIN_TOUCH_TARGET } from '../../theme/spacing';
-import { fontSizes, fontWeights } from '../../theme/typography';
+import { getRiskColor } from '../../../domain/services/riskAssessment';
 
-type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
+// --- Enable Layout Animation for Android ---
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
-/* ------------------------------------------------------------------ */
-/*  Shadows                                                            */
-/* ------------------------------------------------------------------ */
+const { width } = Dimensions.get('window');
 
-const SHADOW_XS = Platform.select({
-  ios: { shadowColor: 'rgba(0,0,0,0.04)', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 1, shadowRadius: 4 },
-  android: { elevation: 1 },
-}) as any;
-
-const SHADOW_SM = Platform.select({
-  ios: { shadowColor: 'rgba(0,0,0,0.06)', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 10 },
-  android: { elevation: 2 },
-}) as any;
-
-const SHADOW_MD = Platform.select({
-  ios: { shadowColor: 'rgba(0,0,0,0.08)', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 1, shadowRadius: 16 },
-  android: { elevation: 4 },
-}) as any;
-
-const SHADOW_CTA = Platform.select({
-  ios: { shadowColor: '#E8467A', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 16 },
-  android: { elevation: 6 },
-}) as any;
-
-const CARD_RADIUS = 22;
-
-/* ------------------------------------------------------------------ */
-/*  Animated Helpers                                                    */
-/* ------------------------------------------------------------------ */
-
-const FadeIn: React.FC<{ delay?: number; children: React.ReactNode }> = ({ delay = 0, children }) => {
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(14)).current;
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(opacity, { toValue: 1, duration: 400, delay, useNativeDriver: true }),
-      Animated.timing(translateY, { toValue: 0, duration: 400, delay, useNativeDriver: true }),
-    ]).start();
-  }, []);
-  return <Animated.View style={{ opacity, transform: [{ translateY }] }}>{children}</Animated.View>;
+// --- Design System Constants ---
+const THEME = {
+  colors: {
+    primary: '#FB7185', // Rose 400
+    primaryDark: '#E11D48', // Rose 600
+    primaryLight: '#FFF1F2', // Rose 50
+    secondary: '#818CF8', // Indigo 400
+    background: '#FAFAF9', // Stone 50
+    card: '#FFFFFF',
+    textMain: '#1C1917', // Stone 900
+    textSub: '#57534E', // Stone 500
+    textMuted: '#A8A29E', // Stone 400
+    success: '#34D399', // Emerald 400
+    warning: '#FBBF24', // Amber 400
+    danger: '#F87171', // Red 400
+  },
+  spacing: {
+    xs: 8,
+    sm: 12,
+    md: 20,
+    lg: 24,
+    xl: 32,
+  },
+  radius: {
+    sm: 12,
+    md: 20,
+    lg: 32,
+    pill: 100,
+  },
+  shadows: {
+    soft: {
+      shadowColor: '#881337',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.08,
+      shadowRadius: 24,
+      elevation: 5,
+    },
+    float: {
+      shadowColor: '#881337',
+      shadowOffset: { width: 0, height: 12 },
+      shadowOpacity: 0.12,
+      shadowRadius: 30,
+      elevation: 8,
+    },
+  },
 };
 
-const AnimPress: React.FC<{ children: React.ReactNode; onPress?: () => void; style?: any; disabled?: boolean }> = ({
-  children, onPress, style, disabled,
-}) => {
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+// --- Helper Components ---
+
+/**
+ * Modern Card Container
+ * Used for encapsulating content sections
+ */
+const Card = ({ children, style, delay = 0 }: { children: React.ReactNode; style?: any; delay?: number }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        delay,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        delay,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  return (
+    <Animated.View
+      style={[
+        styles.card,
+        style,
+        { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
+      ]}
+    >
+      {children}
+    </Animated.View>
+  );
+};
+
+/**
+ * Animated Pressable Button
+ * Adds a subtle scale effect on press
+ */
+const BouncyBtn = ({ onPress, style, children, disabled }: { onPress: () => void; style?: any; children: React.ReactNode; disabled?: boolean }) => {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scale, {
+      toValue: 0.96,
+      useNativeDriver: true,
+      speed: 200,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 200,
+    }).start();
+  };
+
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
-      onPressIn={() => Animated.spring(scaleAnim, { toValue: 0.97, useNativeDriver: true, speed: 50, bounciness: 4 }).start()}
-      onPressOut={() => Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, speed: 50, bounciness: 4 }).start()}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
     >
-      <Animated.View style={[style, { transform: [{ scale: scaleAnim }] }]}>{children}</Animated.View>
+      <Animated.View style={[style, { transform: [{ scale }] }]}>
+        {children}
+      </Animated.View>
     </Pressable>
   );
 };
 
-/* ------------------------------------------------------------------ */
-/*  Progress Bar                                                       */
-/* ------------------------------------------------------------------ */
-
-const ProgressBar: React.FC<{ percentage: number; current: number; total: number }> = ({ percentage, current, total }) => {
+/**
+ * Modern Progress Bar
+ * Sleek, thin line with a glowing leading edge
+ */
+const ModernProgressBar = ({ current, total }: { current: number; total: number }) => {
+  const percentage = (current / total) * 100;
   const widthAnim = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
-    Animated.timing(widthAnim, { toValue: percentage, duration: 400, useNativeDriver: false }).start();
+    Animated.timing(widthAnim, {
+      toValue: percentage,
+      duration: 500,
+      useNativeDriver: false, // width doesn't support native driver
+    }).start();
   }, [percentage]);
-  const animWidth = widthAnim.interpolate({ inputRange: [0, 100], outputRange: ['0%', '100%'], extrapolate: 'clamp' });
 
   return (
-    <View style={st.progressRow}>
-      <View style={st.progressTrack}>
-        <Animated.View style={[st.progressFill, { width: animWidth }]}>
-          <LinearGradient colors={['#E8467A', '#F48FB1']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={StyleSheet.absoluteFill} />
+    <View style={styles.progressContainer}>
+      <View style={styles.progressTrack}>
+        <Animated.View
+          style={[
+            styles.progressFill,
+            {
+              width: widthAnim.interpolate({
+                inputRange: [0, 100],
+                outputRange: ['0%', '100%'],
+              }),
+            },
+          ]}
+        >
+          <LinearGradient
+            colors={[THEME.colors.primary, THEME.colors.secondary]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={StyleSheet.absoluteFill}
+          />
         </Animated.View>
       </View>
-      <View style={st.progressPill}>
-        <Text style={st.progressPillText}>{current}/{total}</Text>
-      </View>
+      <Text style={styles.progressText}>
+        {current} <Text style={{ color: THEME.colors.textMuted }}>/ {total}</Text>
+      </Text>
     </View>
   );
 };
 
-/* ------------------------------------------------------------------ */
-/*  Section Icons (mapping emoji to Ionicons)                          */
-/* ------------------------------------------------------------------ */
-
-const SECTION_ICONS: Record<string, { icon: IoniconsName; color: string }> = {
-  visual: { icon: 'eye-outline', color: '#8B5CF6' },
-  palpation: { icon: 'hand-left-outline', color: '#E8467A' },
-  additional: { icon: 'document-text-outline', color: '#3B82F6' },
-};
-
-/* ------------------------------------------------------------------ */
-/*  Main Component                                                     */
-/* ------------------------------------------------------------------ */
+// --- Main Screen Component ---
 
 export const AutopalpationScreen: React.FC = () => {
   const { t } = useTranslation();
   const { isRTL } = useLanguageStore();
   const {
-    isExamActive, currentSectionIndex, currentQuestionIndex,
-    answers, examResult, startExam, answerQuestion,
-    nextQuestion, previousQuestion, completeExam, resetExam,
-    getProgress, lastExamDate,
+    isExamActive,
+    currentSectionIndex,
+    currentQuestionIndex,
+    answers,
+    examResult,
+    startExam,
+    answerQuestion,
+    nextQuestion,
+    previousQuestion,
+    completeExam,
+    resetExam,
+    getProgress,
+    lastExamDate,
   } = useExamStore();
 
-  /* ================================================================ */
-  /*  INTRO SCREEN                                                     */
-  /* ================================================================ */
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  // Scroll to top on question change
+  useEffect(() => {
+    if (isExamActive && scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({ y: 0, animated: true });
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    }
+  }, [currentQuestionIndex, currentSectionIndex, isExamActive]);
+
+  const renderHeader = (title: string, subtitle?: string) => (
+    <View style={styles.headerContainer}>
+      <View style={styles.headerBlob} />
+      <View style={styles.headerContent}>
+        <Text style={[styles.headerTitle, isRTL && styles.rtlText]}>{title}</Text>
+        {subtitle && (
+          <Text style={[styles.headerSubtitle, isRTL && styles.rtlText]}>{subtitle}</Text>
+        )}
+      </View>
+    </View>
+  );
+
+  // --- 1. INTRO VIEW ---
   if (!isExamActive && !examResult) {
     return (
-      <View style={st.root}>
+      <View style={styles.screen}>
+        <StatusBar barStyle="dark-content" />
         <LinearGradient
-          colors={['#FFF5F8', '#FEF0F4', '#F8F9FC', '#F5F6FA']}
-          locations={[0, 0.2, 0.5, 1]}
+          colors={['#FFF1F2', '#FFF', '#F0F9FF']}
           style={StyleSheet.absoluteFill}
         />
-        <SafeAreaView style={st.flex} edges={['top']}>
-          <ScrollView contentContainerStyle={st.introScroll} showsVerticalScrollIndicator={false}>
-            {/* Header */}
-            <FadeIn>
-              <View style={st.introHeader}>
-                <LinearGradient
-                  colors={['#E8467A', '#F06292', '#F8A4C0']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={st.introHeaderGrad}
-                >
-                  <View style={st.introBlob1} />
-                  <View style={st.introBlob2} />
-                  <Text style={[st.introTitle, isRTL && st.textRTL]}>{t('autopalpation.title')}</Text>
-                  <Text style={[st.introSub, isRTL && st.textRTL]}>{t('autopalpation.subtitle')}</Text>
-                </LinearGradient>
-              </View>
-            </FadeIn>
+        <SafeAreaView style={styles.safeArea}>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            {renderHeader(t('autopalpation.title'), t('autopalpation.subtitle'))}
 
-            <View style={st.introBody}>
-              <FadeIn delay={60}>
-                <MedicalDisclaimer type="assessment" />
-              </FadeIn>
+            <Card delay={100} style={styles.introCard}>
+              <MedicalDisclaimer type="assessment" />
 
-              {/* Last exam info */}
               {lastExamDate && (
-                <FadeIn delay={100}>
-                  <View style={st.lastExamCard}>
-                    <View style={st.lastExamIconBg}>
-                      <Ionicons name="calendar-outline" size={18} color="#E8467A" />
-                    </View>
-                    <Text style={[st.lastExamText, isRTL && st.textRTL]}>
-                      {t('home.lastExam')}: {t('home.daysAgo', {
-                        count: Math.floor((Date.now() - lastExamDate) / (1000 * 60 * 60 * 24)),
-                      })}
-                    </Text>
+                <View style={[styles.infoRow, { marginTop: 16 }]}>
+                  <View style={styles.iconBox}>
+                    <Ionicons name="time-outline" size={20} color={THEME.colors.primary} />
                   </View>
-                </FadeIn>
+                  <Text style={[styles.infoText, isRTL && styles.rtlText]}>
+                    {t('home.lastExam')}: {t('home.daysAgo', { count: Math.floor((Date.now() - lastExamDate) / 86400000) })}
+                  </Text>
+                </View>
               )}
+            </Card>
 
-              {/* Steps overview */}
-              <FadeIn delay={140}>
-                <Text style={[st.sectionLabel, isRTL && st.textRTL]}>
-                  {t('home.quickActions', 'Étapes')}
-                </Text>
-              </FadeIn>
-              {EXAM_SECTIONS.map((section, index) => {
-                const sectionMeta = SECTION_ICONS[section.id] || { icon: 'ellipsis-horizontal' as IoniconsName, color: '#64748B' };
-                return (
-                  <FadeIn key={section.id} delay={180 + index * 60}>
-                    <View style={[st.stepCard, isRTL && st.stepCardRTL]}>
-                      <LinearGradient
-                        colors={[sectionMeta.color, sectionMeta.color + 'CC']}
-                        style={st.stepBadge}
-                      >
-                        <Text style={st.stepBadgeText}>{index + 1}</Text>
-                      </LinearGradient>
-                      <View style={st.stepContent}>
-                        <Text style={[st.stepTitle, isRTL && st.textRTL]}>{t(section.titleKey)}</Text>
-                        <Text style={[st.stepDesc, isRTL && st.textRTL]}>{t(section.descriptionKey)}</Text>
-                      </View>
-                      <View style={[st.stepIconBg, { backgroundColor: sectionMeta.color + '10' }]}>
-                        <Ionicons name={sectionMeta.icon} size={20} color={sectionMeta.color} />
-                      </View>
-                    </View>
-                  </FadeIn>
-                );
-              })}
-
-              <FadeIn delay={360}>
-                <AnimPress onPress={startExam} style={st.ctaOuter}>
-                  <LinearGradient colors={['#E8467A', '#D63A6B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={st.ctaGrad}>
-                    <Text style={st.ctaText}>{t('autopalpation.start')}</Text>
-                    <Ionicons name={isRTL ? 'arrow-back' : 'arrow-forward'} size={20} color="#FFF" />
-                  </LinearGradient>
-                </AnimPress>
-              </FadeIn>
+            <View style={styles.stepsContainer}>
+              {EXAM_SECTIONS.map((section, idx) => (
+                <Card key={section.id} delay={200 + (idx * 100)} style={styles.stepItem}>
+                  <View style={[styles.stepNumber, isRTL && styles.stepNumberRtl]}>
+                    <Text style={styles.stepNumberText}>{idx + 1}</Text>
+                  </View>
+                  <View style={styles.stepTextContent}>
+                    <Text style={[styles.stepTitle, isRTL && styles.rtlText]}>{t(section.titleKey)}</Text>
+                    <Text style={[styles.stepDesc, isRTL && styles.rtlText]}>{t(section.descriptionKey)}</Text>
+                  </View>
+                </Card>
+              ))}
             </View>
           </ScrollView>
+
+          <View style={styles.bottomFloat}>
+            <BouncyBtn onPress={startExam} style={styles.mainButton}>
+              <LinearGradient
+                colors={[THEME.colors.primary, THEME.colors.primaryDark]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.gradientBtn}
+              >
+                <Text style={styles.mainButtonText}>{t('autopalpation.start')}</Text>
+                <Ionicons name={isRTL ? "arrow-back" : "arrow-forward"} size={24} color="#FFF" />
+              </LinearGradient>
+            </BouncyBtn>
+          </View>
         </SafeAreaView>
       </View>
     );
   }
 
-  /* ================================================================ */
-  /*  RESULTS SCREEN                                                   */
-  /* ================================================================ */
+  // --- 2. RESULTS VIEW ---
   if (examResult && !isExamActive) {
-    const riskColor = examResult.riskLevel === 'low' ? '#10B981' : examResult.riskLevel === 'moderate' ? '#F59E0B' : '#EF4444';
-    const riskBgLight = examResult.riskLevel === 'low' ? '#ECFDF5' : examResult.riskLevel === 'moderate' ? '#FFFBEB' : '#FEF2F2';
-    const riskIconName: IoniconsName = examResult.riskLevel === 'low' ? 'checkmark-circle' : examResult.riskLevel === 'moderate' ? 'alert-circle' : 'warning';
+    const isLowRisk = examResult.riskLevel === 'low';
+    const resultColor = isLowRisk ? THEME.colors.success : examResult.riskLevel === 'moderate' ? THEME.colors.warning : THEME.colors.danger;
 
     return (
-      <View style={st.root}>
-        <LinearGradient colors={['#FFF5F8', '#FEF0F4', '#F8F9FC', '#F5F6FA']} locations={[0, 0.2, 0.5, 1]} style={StyleSheet.absoluteFill} />
-        <SafeAreaView style={st.flex} edges={['top']}>
-          <ScrollView contentContainerStyle={st.resultScroll} showsVerticalScrollIndicator={false}>
-            <FadeIn>
-              <Text style={[st.resultTitle, isRTL && st.textRTL]}>{t('results.title')}</Text>
-            </FadeIn>
+      <View style={styles.screen}>
+        <StatusBar barStyle="dark-content" />
+        <LinearGradient
+          colors={['#FFF', '#FAFAF9']}
+          style={StyleSheet.absoluteFill}
+        />
+        <SafeAreaView style={styles.safeArea}>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            <Text style={[styles.headerTitle, { marginBottom: 20, paddingHorizontal: 20 }, isRTL && styles.rtlText]}>
+              {t('results.title')}
+            </Text>
 
-            {/* Risk card */}
-            <FadeIn delay={80}>
-              <View style={[st.riskCard, { borderColor: riskColor + '30' }]}>
-                <LinearGradient colors={[riskBgLight, '#FFFFFF']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={st.riskInner}>
-                  <View style={[st.riskIconCircle, { backgroundColor: riskColor + '15' }]}>
-                    <Ionicons name={riskIconName} size={34} color={riskColor} />
-                  </View>
-                  <Text style={[st.riskLevel, { color: riskColor }]}>{t(examResult.recommendationKey)}</Text>
-                  <Text style={[st.riskMsg, isRTL && st.textRTL]}>{t(examResult.messageKey)}</Text>
-                </LinearGradient>
+            <Card style={[styles.resultCard, { borderTopColor: resultColor }]}>
+              <View style={[styles.resultIconRing, { backgroundColor: resultColor + '20' }]}>
+                <Ionicons
+                  name={isLowRisk ? "shield-checkmark" : "alert-circle"}
+                  size={40}
+                  color={resultColor}
+                />
               </View>
-            </FadeIn>
+              <Text style={[styles.resultLevel, { color: resultColor }]}>
+                {t(examResult.recommendationKey)}
+              </Text>
+              <Text style={[styles.resultMessage, isRTL && styles.rtlText]}>
+                {t(examResult.messageKey)}
+              </Text>
+            </Card>
 
-            {/* Red flags */}
             {examResult.redFlags.length > 0 && (
-              <FadeIn delay={160}>
-                <View style={st.flagsSection}>
-                  <Text style={[st.sectionLabel, isRTL && st.textRTL]}>{t('results.red_flags')}</Text>
-                  {examResult.redFlags.map((flag) => (
-                    <View key={flag} style={[st.flagItem, isRTL && st.flagItemRTL]}>
-                      <View style={st.flagIconBg}>
-                        <Ionicons name="alert-circle" size={14} color="#F59E0B" />
-                      </View>
-                      <Text style={[st.flagText, isRTL && st.textRTL]}>{t(`exam.questions.${flag}.title`)}</Text>
-                    </View>
-                  ))}
-                </View>
-              </FadeIn>
-            )}
-
-            {/* Next steps */}
-            <FadeIn delay={240}>
-              <View style={st.stepsSection}>
-                <Text style={[st.sectionLabel, isRTL && st.textRTL]}>{t('results.next_steps')}</Text>
-                {examResult.nextStepsKeys.map((stepKey, index) => (
-                  <View key={index} style={[st.nextStep, isRTL && st.nextStepRTL]}>
-                    <LinearGradient colors={[riskColor, riskColor + 'CC']} style={st.nextStepNum}>
-                      <Text style={st.nextStepNumText}>{index + 1}</Text>
-                    </LinearGradient>
-                    <Text style={[st.nextStepText, isRTL && st.textRTL]}>{t(stepKey)}</Text>
-                  </View>
+              <View style={styles.sectionBlock}>
+                <Text style={[styles.sectionHeader, isRTL && styles.rtlText]}>{t('results.red_flags')}</Text>
+                {examResult.redFlags.map((flag, idx) => (
+                  <Card key={idx} delay={100 * idx} style={styles.flagCard}>
+                    <Ionicons name="warning" size={20} color={THEME.colors.danger} />
+                    <Text style={[styles.flagText, isRTL && styles.rtlText]}>
+                      {t(`exam.questions.${flag}.title`)}
+                    </Text>
+                  </Card>
                 ))}
               </View>
-            </FadeIn>
+            )}
 
-            <FadeIn delay={320}>
-              <MedicalDisclaimer />
-            </FadeIn>
+            <View style={styles.sectionBlock}>
+              <Text style={[styles.sectionHeader, isRTL && styles.rtlText]}>{t('results.next_steps')}</Text>
+              {examResult.nextStepsKeys.map((stepKey, index) => (
+                <View key={index} style={[styles.todoItem, isRTL && styles.rowReverse]}>
+                  <View style={styles.todoCheck}>
+                    <Ionicons name="checkbox" size={24} color={THEME.colors.primary} />
+                  </View>
+                  <Text style={[styles.todoText, isRTL && styles.rtlText]}>{t(stepKey)}</Text>
+                </View>
+              ))}
+            </View>
 
-            <FadeIn delay={380}>
-              <AnimPress onPress={() => resetExam()} style={st.ctaOuter}>
-                <LinearGradient colors={['#E8467A', '#D63A6B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={st.ctaGrad}>
-                  <Ionicons name="refresh-outline" size={20} color="#FFF" />
-                  <Text style={st.ctaText}>{t('results.new_exam')}</Text>
-                </LinearGradient>
-              </AnimPress>
-            </FadeIn>
+            <BouncyBtn onPress={resetExam} style={[styles.outlineBtn, { marginBottom: 40 }]}>
+              <Text style={styles.outlineBtnText}>{t('results.new_exam')}</Text>
+            </BouncyBtn>
           </ScrollView>
         </SafeAreaView>
       </View>
     );
   }
 
-  /* ================================================================ */
-  /*  ACTIVE EXAM — QUESTION FLOW                                      */
-  /* ================================================================ */
+  // --- 3. ACTIVE EXAM FLOW ---
   const section = EXAM_SECTIONS[currentSectionIndex];
   const question = section.questions[currentQuestionIndex];
   const progress = getProgress();
 
   if (!shouldShowQuestion(question, answers)) {
+    // Logic handler: skip render if question hidden
     const hasMore = nextQuestion();
     if (!hasMore) completeExam();
-    return null;
+    return <View style={styles.screen} />;
   }
-
-  const sectionMeta = SECTION_ICONS[section.id] || { icon: 'ellipsis-horizontal' as IoniconsName, color: '#64748B' };
-
-  const handleAnswer = (answer: unknown) => answerQuestion(question.id, answer);
 
   const handleNext = () => {
     if (answers[question.id] === undefined) return;
@@ -335,321 +402,589 @@ export const AutopalpationScreen: React.FC = () => {
   };
 
   return (
-    <View style={st.root}>
+    <View style={styles.screen}>
+      <StatusBar barStyle="dark-content" />
       <LinearGradient
-        colors={['#FFF5F8', '#F8F9FC', '#F5F6FA']}
-        locations={[0, 0.4, 1]}
+        colors={['#FFF1F2', '#FAFAF9', '#FAFAF9']}
+        locations={[0, 0.3, 1]}
         style={StyleSheet.absoluteFill}
       />
-      <SafeAreaView style={st.flex} edges={['top']}>
-        {/* Progress bar */}
-        <ProgressBar percentage={progress.percentage} current={progress.current} total={progress.total} />
+      <SafeAreaView style={styles.safeArea}>
 
-        {/* Section indicator */}
-        <View style={[st.sectionIndicator, isRTL && st.rowRTL]}>
-          <LinearGradient colors={[sectionMeta.color, sectionMeta.color + 'CC']} style={st.sectionBadge}>
-            <Ionicons name={sectionMeta.icon} size={16} color="#FFF" />
-          </LinearGradient>
-          <Text style={[st.sectionName, isRTL && st.textRTL]}>{t(section.titleKey)}</Text>
-        </View>
-
-        <ScrollView contentContainerStyle={st.questionScroll} showsVerticalScrollIndicator={false}>
-          {/* Instruction (first question of section) */}
-          {currentQuestionIndex === 0 && (
-            <View style={[st.instructionCard, { borderLeftColor: sectionMeta.color }]}>
-              <Text style={[st.instructionText, isRTL && st.textRTL]}>
-                {t(`exam.instructions.${section.id}`)}
-              </Text>
-            </View>
-          )}
-
-          {/* Question */}
-          <Text style={[st.questionTitle, isRTL && st.textRTL]}>{t(question.titleKey)}</Text>
-          <Text style={[st.questionDesc, isRTL && st.textRTL]}>{t(question.descriptionKey)}</Text>
-
-          {/* Boolean */}
-          {question.type === 'boolean' && (
-            <View style={st.boolRow}>
-              {[true, false].map((val) => {
-                const selected = answers[question.id] === val;
-                const isWarning = selected && val && question.redFlag;
-                return (
-                  <AnimPress
-                    key={val ? 'yes' : 'no'}
-                    onPress={() => handleAnswer(val)}
-                    style={[
-                      st.boolCard,
-                      selected && st.boolCardSelected,
-                      isWarning && st.boolCardWarning,
-                    ]}
-                  >
-                    <View style={[st.boolIconBg, selected ? { backgroundColor: isWarning ? '#FEF2F2' : '#FDE8EF' } : {}]}>
-                      <Ionicons
-                        name={val ? 'checkmark-circle' : 'close-circle'}
-                        size={24}
-                        color={selected ? (isWarning ? '#EF4444' : '#E8467A') : '#94A3B8'}
-                      />
-                    </View>
-                    <Text style={[st.boolText, selected && st.boolTextSelected, isWarning && st.boolTextWarning]}>
-                      {val ? t('exam.answer.yes') : t('exam.answer.no')}
-                    </Text>
-                  </AnimPress>
-                );
-              })}
-            </View>
-          )}
-
-          {/* Multi-select */}
-          {question.type === 'multi_select' && question.options && (
-            <View style={st.multiWrap}>
-              {question.options.map((option) => {
-                const selected = Array.isArray(answers[question.id]) &&
-                  (answers[question.id] as string[]).includes(option.value);
-                return (
-                  <AnimPress
-                    key={option.value}
-                    style={[st.multiOption, selected && st.multiOptionSelected]}
-                    onPress={() => {
-                      const current = (answers[question.id] as string[]) || [];
-                      const updated = selected
-                        ? current.filter((v) => v !== option.value)
-                        : [...current, option.value];
-                      handleAnswer(updated);
-                    }}
-                  >
-                    <View style={[st.checkbox, selected && st.checkboxSelected]}>
-                      {selected && <Ionicons name="checkmark" size={14} color="#FFF" />}
-                    </View>
-                    <Text style={[st.multiOptionText, isRTL && st.textRTL]}>{t(option.labelKey)}</Text>
-                  </AnimPress>
-                );
-              })}
-            </View>
-          )}
-
-          {/* Quadrant */}
-          {question.type === 'quadrant' && question.options && (
-            <View style={st.quadWrap}>
-              {question.options.map((option) => {
-                const selected = answers[question.id] === option.value;
-                return (
-                  <AnimPress
-                    key={option.value}
-                    style={[st.quadOption, selected && st.quadOptionSelected]}
-                    onPress={() => handleAnswer(option.value)}
-                  >
-                    <View style={[st.quadDot, selected && st.quadDotSelected]} />
-                    <Text style={[st.quadText, selected && st.quadTextSelected, isRTL && st.textRTL]}>
-                      {t(option.labelKey)}
-                    </Text>
-                    {selected && (
-                      <Ionicons name="checkmark-circle" size={20} color="#E8467A" style={{ marginLeft: 'auto' }} />
-                    )}
-                  </AnimPress>
-                );
-              })}
-            </View>
-          )}
-        </ScrollView>
-
-        {/* Navigation buttons */}
-        <View style={[st.navBar, isRTL && st.navBarRTL]}>
+        {/* Top Bar */}
+        <View style={[styles.navHeader, isRTL && styles.rowReverse]}>
           <Pressable
-            style={st.navBack}
             onPress={previousQuestion}
             disabled={progress.current <= 1}
+            style={({ pressed }) => ({ opacity: pressed || progress.current <= 1 ? 0.5 : 1 })}
           >
-            <Ionicons
-              name={isRTL ? 'chevron-forward' : 'chevron-back'}
-              size={18}
-              color={progress.current <= 1 ? '#CBD5E1' : '#64748B'}
-            />
-            <Text style={[st.navBackText, progress.current <= 1 && st.navDisabled]}>
-              {t('common.previous')}
-            </Text>
+            <View style={styles.navIconBox}>
+              <Ionicons name={isRTL ? "chevron-forward" : "chevron-back"} size={24} color={THEME.colors.textMain} />
+            </View>
           </Pressable>
-          <AnimPress
-            style={[st.navNext, answers[question.id] === undefined && st.navNextDisabled]}
+          <View style={styles.sectionTag}>
+            <Text style={styles.sectionTagText}>{t(section.titleKey)}</Text>
+          </View>
+          <View style={{ width: 40 }} />
+        </View>
+
+        <ModernProgressBar current={progress.current} total={progress.total} />
+
+        <ScrollView
+          ref={scrollViewRef}
+          contentContainerStyle={styles.questionScroll}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Question Card */}
+          <Card style={styles.questionCard}>
+            <Text style={[styles.questionTitle, isRTL && styles.rtlText]}>
+              {t(question.titleKey)}
+            </Text>
+            {question.descriptionKey && (
+              <Text style={[styles.questionDesc, isRTL && styles.rtlText]}>
+                {t(question.descriptionKey)}
+              </Text>
+            )}
+
+            {/* Instruction Context (only for first question of section) */}
+            {currentQuestionIndex === 0 && (
+              <View style={styles.instructionBox}>
+                <Ionicons name="information-circle" size={20} color={THEME.colors.secondary} />
+                <Text style={[styles.instructionText, isRTL && styles.rtlText]}>
+                  {t(`exam.instructions.${section.id}`)}
+                </Text>
+              </View>
+            )}
+          </Card>
+
+          {/* Answer Area */}
+          <View style={styles.answersContainer}>
+
+            {/* BOOLEAN TYPE */}
+            {question.type === 'boolean' && (
+              <View style={[styles.boolRow, isRTL && styles.rowReverse]}>
+                {[true, false].map((val) => {
+                  const isSelected = answers[question.id] === val;
+                  return (
+                    <BouncyBtn
+                      key={String(val)}
+                      onPress={() => answerQuestion(question.id, val)}
+                      style={[
+                        styles.boolOption,
+                        isSelected && (val ? styles.boolSelectedYes : styles.boolSelectedNo)
+                      ]}
+                    >
+                      <Ionicons
+                        name={val ? "checkmark-circle" : "close-circle"}
+                        size={32}
+                        color={isSelected ? '#FFF' : (val ? THEME.colors.success : THEME.colors.textMuted)}
+                      />
+                      <Text style={[
+                        styles.boolText,
+                        isSelected && { color: '#FFF' }
+                      ]}>
+                        {val ? t('exam.answer.yes') : t('exam.answer.no')}
+                      </Text>
+                    </BouncyBtn>
+                  );
+                })}
+              </View>
+            )}
+
+            {/* MULTI SELECT & QUADRANT */}
+            {(question.type === 'multi_select' || question.type === 'quadrant') && question.options && (
+              <View style={styles.listOptions}>
+                {question.options.map((opt) => {
+                  const currentAns = answers[question.id];
+                  let isSelected = false;
+
+                  if (question.type === 'multi_select' && Array.isArray(currentAns)) {
+                    isSelected = currentAns.includes(opt.value);
+                  } else {
+                    isSelected = currentAns === opt.value;
+                  }
+
+                  return (
+                    <BouncyBtn
+                      key={opt.value}
+                      style={[styles.listOptionItem, isSelected && styles.listOptionSelected, isRTL && styles.rowReverse]}
+                      onPress={() => {
+                        if (question.type === 'quadrant') {
+                          answerQuestion(question.id, opt.value);
+                        } else {
+                          // Multi select logic
+                          const arr = (answers[question.id] as string[]) || [];
+                          const newArr = isSelected
+                            ? arr.filter(v => v !== opt.value)
+                            : [...arr, opt.value];
+                          answerQuestion(question.id, newArr);
+                        }
+                      }}
+                    >
+                      <View style={[styles.checkboxBase, isSelected && styles.checkboxActive]}>
+                        {isSelected && <Ionicons name="checkmark" size={16} color="#FFF" />}
+                      </View>
+                      <Text style={[
+                        styles.listOptionText,
+                        isSelected && styles.listOptionTextSelected,
+                        isRTL && styles.rtlText
+                      ]}>
+                        {t(opt.labelKey)}
+                      </Text>
+                    </BouncyBtn>
+                  );
+                })}
+              </View>
+            )}
+          </View>
+        </ScrollView>
+
+        {/* Floating Next Button */}
+        <View style={styles.bottomFloat}>
+          <BouncyBtn
             onPress={handleNext}
             disabled={answers[question.id] === undefined}
+            style={[
+              styles.mainButton,
+              answers[question.id] === undefined && styles.disabledButton
+            ]}
           >
-            <Text style={st.navNextText}>
-              {progress.current >= progress.total ? t('common.done') : t('common.next')}
-            </Text>
-            <Ionicons
-              name={isRTL ? 'chevron-back' : 'chevron-forward'}
-              size={18}
-              color="#FFF"
-            />
-          </AnimPress>
+            <LinearGradient
+              colors={answers[question.id] === undefined
+                ? ['#E5E7EB', '#D1D5DB']
+                : [THEME.colors.primary, THEME.colors.primaryDark]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.gradientBtn}
+            >
+              <Text style={[
+                styles.mainButtonText,
+                answers[question.id] === undefined && { color: '#9CA3AF' }
+              ]}>
+                {progress.current >= progress.total ? t('common.done') : t('common.next')}
+              </Text>
+              <Ionicons
+                name={isRTL ? "arrow-back" : "arrow-forward"}
+                size={20}
+                color={answers[question.id] === undefined ? '#9CA3AF' : '#FFF'}
+              />
+            </LinearGradient>
+          </BouncyBtn>
         </View>
       </SafeAreaView>
     </View>
   );
 };
 
-/* ================================================================== */
-/*  Styles                                                             */
-/* ================================================================== */
+// --- STYLES ---
 
-const st = StyleSheet.create({
-  root: { flex: 1 },
-  flex: { flex: 1 },
-  textRTL: { textAlign: 'right', writingDirection: 'rtl' },
-  rowRTL: { flexDirection: 'row-reverse' },
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: THEME.colors.background,
+  },
+  safeArea: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: THEME.spacing.lg,
+    paddingBottom: 100,
+  },
+  rtlText: {
+    textAlign: 'right',
+  },
+  rowReverse: {
+    flexDirection: 'row-reverse',
+  },
 
-  /* Progress */
-  progressRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 10, gap: 8 },
-  progressTrack: { flex: 1, height: 6, backgroundColor: '#E2E8F0', borderRadius: 3, overflow: 'hidden' },
-  progressFill: { height: '100%', borderRadius: 3, overflow: 'hidden' },
-  progressPill: { backgroundColor: '#FDE8EF', paddingHorizontal: 10, paddingVertical: 3, borderRadius: 12 },
-  progressPillText: { fontSize: 12, fontWeight: '700', color: '#E8467A' },
+  /* HEADER */
+  headerContainer: {
+    marginBottom: THEME.spacing.xl,
+    paddingHorizontal: THEME.spacing.md,
+    marginTop: THEME.spacing.md,
+  },
+  headerBlob: {
+    position: 'absolute',
+    top: -60,
+    right: -20,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: THEME.colors.primary + '15', // 15% opacity
+    transform: [{ scaleX: 1.5 }],
+  },
+  headerContent: {
+    zIndex: 1,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: THEME.colors.textMain,
+    letterSpacing: -0.5,
+    marginBottom: 4,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: THEME.colors.textSub,
+    lineHeight: 24,
+  },
 
-  /* Intro */
-  introScroll: { paddingBottom: 80 },
-  introHeader: { ...SHADOW_MD },
-  introHeaderGrad: {
-    paddingHorizontal: 24, paddingTop: 28, paddingBottom: 32,
-    borderBottomLeftRadius: 28, borderBottomRightRadius: 28, overflow: 'hidden',
+  /* CARDS */
+  card: {
+    backgroundColor: THEME.colors.card,
+    borderRadius: THEME.radius.lg,
+    padding: THEME.spacing.lg,
+    marginBottom: THEME.spacing.md,
+    ...THEME.shadows.soft,
   },
-  introBlob1: {
-    position: 'absolute', width: 120, height: 120, borderRadius: 60,
-    backgroundColor: 'rgba(255,255,255,0.12)', top: -20, right: -20,
+  introCard: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.03)',
   },
-  introBlob2: {
-    position: 'absolute', width: 70, height: 70, borderRadius: 35,
-    backgroundColor: 'rgba(255,255,255,0.08)', bottom: -10, left: 30,
-  },
-  introTitle: { fontSize: 25, fontWeight: '800', color: '#FFF', marginBottom: 6, letterSpacing: -0.5 },
-  introSub: { fontSize: 14, fontWeight: '400', color: 'rgba(255,255,255,0.9)', lineHeight: 20 },
-  introBody: { padding: 20 },
 
-  lastExamCard: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    backgroundColor: '#FFF', borderRadius: CARD_RADIUS, padding: 16, marginTop: 16,
-    borderWidth: 1, borderColor: 'rgba(0,0,0,0.04)', ...SHADOW_XS,
+  /* STEPS */
+  stepsContainer: {
+    gap: THEME.spacing.md,
+    marginTop: THEME.spacing.lg,
   },
-  lastExamIconBg: { width: 40, height: 40, borderRadius: 14, backgroundColor: '#FDE8EF', justifyContent: 'center', alignItems: 'center' },
-  lastExamText: { flex: 1, fontSize: 14, color: '#64748B', fontWeight: '500' },
+  stepItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: THEME.spacing.md,
+    gap: THEME.spacing.md,
+  },
+  stepNumber: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    backgroundColor: THEME.colors.primaryLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  stepNumberRtl: {
+    marginLeft: THEME.spacing.sm,
+  },
+  stepNumberText: {
+    color: THEME.colors.primary,
+    fontWeight: '800',
+    fontSize: 16,
+  },
+  stepTextContent: {
+    flex: 1,
+  },
+  stepTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: THEME.colors.textMain,
+  },
+  stepDesc: {
+    fontSize: 13,
+    color: THEME.colors.textMuted,
+    marginTop: 2,
+  },
 
-  sectionLabel: { fontSize: 19, fontWeight: '700', color: '#0F172A', marginBottom: 14, marginTop: 20, letterSpacing: -0.3 },
+  /* NAVIGATION */
+  navHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: THEME.spacing.md,
+    paddingVertical: THEME.spacing.sm,
+  },
+  navIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: '#FFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+    ...THEME.shadows.soft,
+    shadowOpacity: 0.05,
+  },
+  sectionTag: {
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    backgroundColor: THEME.colors.primaryLight,
+    borderRadius: THEME.radius.pill,
+  },
+  sectionTagText: {
+    color: THEME.colors.primaryDark,
+    fontWeight: '700',
+    fontSize: 12,
+    textTransform: 'uppercase',
+  },
 
-  stepCard: {
-    flexDirection: 'row', alignItems: 'center', gap: 14,
-    backgroundColor: '#FFF', borderRadius: CARD_RADIUS, padding: 16, marginBottom: 10,
-    borderWidth: 1, borderColor: 'rgba(0,0,0,0.04)', ...SHADOW_XS,
+  /* PROGRESS */
+  progressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: THEME.spacing.lg,
+    marginVertical: THEME.spacing.md,
+    gap: 12,
   },
-  stepCardRTL: { flexDirection: 'row-reverse' },
-  stepBadge: { width: 36, height: 36, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
-  stepBadgeText: { color: '#FFF', fontWeight: '800', fontSize: 14 },
-  stepContent: { flex: 1 },
-  stepTitle: { fontSize: 15, fontWeight: '600', color: '#0F172A' },
-  stepDesc: { fontSize: 12, color: '#94A3B8', marginTop: 2, lineHeight: 17 },
-  stepIconBg: { width: 40, height: 40, borderRadius: 14, justifyContent: 'center', alignItems: 'center' },
+  progressTrack: {
+    flex: 1,
+    height: 4,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 2,
+  },
+  progressText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: THEME.colors.textMain,
+    width: 40,
+    textAlign: 'right',
+  },
 
-  /* CTA */
-  ctaOuter: { borderRadius: 18, overflow: 'hidden', marginTop: 24, ...SHADOW_CTA },
-  ctaGrad: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    paddingVertical: 16, minHeight: MIN_TOUCH_TARGET,
+  /* QUESTION AREA */
+  questionScroll: {
+    padding: THEME.spacing.lg,
+    paddingBottom: 120, // space for bottom float
   },
-  ctaText: { color: '#FFF', fontSize: 17, fontWeight: '700', letterSpacing: -0.2 },
+  questionCard: {
+    padding: THEME.spacing.xl,
+    borderRadius: 24,
+  },
+  questionTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: THEME.colors.textMain,
+    lineHeight: 30,
+    marginBottom: 8,
+  },
+  questionDesc: {
+    fontSize: 16,
+    color: THEME.colors.textSub,
+    lineHeight: 24,
+    marginBottom: 16,
+  },
+  instructionBox: {
+    flexDirection: 'row',
+    backgroundColor: '#F8FAFC',
+    padding: 16,
+    borderRadius: 16,
+    gap: 12,
+    marginTop: 12,
+  },
+  instructionText: {
+    flex: 1,
+    fontSize: 13,
+    color: THEME.colors.textSub,
+    lineHeight: 20,
+  },
 
-  /* Section indicator */
-  sectionIndicator: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 20, paddingBottom: 8 },
-  sectionBadge: { width: 34, height: 34, borderRadius: 11, justifyContent: 'center', alignItems: 'center' },
-  sectionName: { fontSize: 15, fontWeight: '600', color: '#64748B' },
+  /* ANSWERS */
+  answersContainer: {
+    marginTop: THEME.spacing.md,
+  },
+  boolRow: {
+    flexDirection: 'row',
+    gap: THEME.spacing.md,
+  },
+  boolOption: {
+    flex: 1,
+    backgroundColor: '#FFF',
+    padding: 24,
+    borderRadius: 24,
+    alignItems: 'center',
+    gap: 12,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    ...THEME.shadows.soft,
+  },
+  boolSelectedYes: {
+    backgroundColor: THEME.colors.success,
+    ...THEME.shadows.float,
+    shadowColor: THEME.colors.success,
+  },
+  boolSelectedNo: {
+    backgroundColor: THEME.colors.textSub, // Neutral dark for No
+    ...THEME.shadows.float,
+  },
+  boolText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: THEME.colors.textSub,
+  },
 
-  /* Question */
-  questionScroll: { padding: 20, paddingBottom: 48 },
-  instructionCard: {
-    backgroundColor: '#FFF', borderRadius: CARD_RADIUS, padding: 18,
-    marginBottom: 20, borderLeftWidth: 4, borderWidth: 1, borderColor: 'rgba(0,0,0,0.04)', ...SHADOW_XS,
+  listOptions: {
+    gap: 12,
   },
-  instructionText: { fontSize: 14, color: '#334155', lineHeight: 22 },
-  questionTitle: { fontSize: 22, fontWeight: '800', color: '#0F172A', marginBottom: 8, letterSpacing: -0.4 },
-  questionDesc: { fontSize: 15, color: '#64748B', lineHeight: 23, marginBottom: 24 },
+  listOptionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+    padding: 20,
+    borderRadius: 20,
+    gap: 16,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+    ...THEME.shadows.soft,
+  },
+  listOptionSelected: {
+    borderColor: THEME.colors.primary,
+    backgroundColor: '#FFF1F2',
+  },
+  checkboxBase: {
+    width: 24,
+    height: 24,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#D1D5DB',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+  },
+  checkboxActive: {
+    backgroundColor: THEME.colors.primary,
+    borderColor: THEME.colors.primary,
+  },
+  listOptionText: {
+    fontSize: 16,
+    color: THEME.colors.textMain,
+    fontWeight: '500',
+    flex: 1,
+  },
+  listOptionTextSelected: {
+    color: THEME.colors.primaryDark,
+    fontWeight: '700',
+  },
 
-  /* Boolean */
-  boolRow: { flexDirection: 'row', gap: 12 },
-  boolCard: {
-    flex: 1, paddingVertical: 22, paddingHorizontal: 16, borderRadius: CARD_RADIUS,
-    borderWidth: 1.5, borderColor: '#E2E8F0', alignItems: 'center', backgroundColor: '#FFF',
-    minHeight: 90, justifyContent: 'center', gap: 8, ...SHADOW_XS,
+  /* FOOTER */
+  bottomFloat: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: THEME.spacing.lg,
+    paddingBottom: Platform.OS === 'ios' ? 0 : THEME.spacing.lg,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.9)',
   },
-  boolCardSelected: { borderColor: '#E8467A', backgroundColor: '#FFFBFC' },
-  boolCardWarning: { borderColor: '#EF4444', backgroundColor: '#FFFBFB' },
-  boolIconBg: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F8FAFC' },
-  boolText: { fontSize: 16, fontWeight: '600', color: '#64748B' },
-  boolTextSelected: { color: '#E8467A' },
-  boolTextWarning: { color: '#EF4444' },
+  mainButton: {
+    borderRadius: 22,
+    overflow: 'hidden',
+    ...THEME.shadows.float,
+    shadowColor: THEME.colors.primary,
+  },
+  disabledButton: {
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  gradientBtn: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 18,
+    gap: 12,
+  },
+  mainButtonText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '700',
+  },
 
-  /* Multi-select */
-  multiWrap: { gap: 10 },
-  multiOption: {
-    flexDirection: 'row', alignItems: 'center', gap: 14,
-    padding: 16, borderRadius: CARD_RADIUS, borderWidth: 1.5, borderColor: '#E2E8F0',
-    backgroundColor: '#FFF', minHeight: MIN_TOUCH_TARGET, ...SHADOW_XS,
+  /* RESULTS SPECIFIC */
+  resultCard: {
+    alignItems: 'center',
+    borderTopWidth: 6,
+    paddingVertical: 40,
   },
-  multiOptionSelected: { borderColor: '#E8467A', backgroundColor: '#FFFBFC' },
-  checkbox: {
-    width: 24, height: 24, borderRadius: 8, borderWidth: 2, borderColor: '#CBD5E1',
-    justifyContent: 'center', alignItems: 'center',
+  resultIconRing: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
   },
-  checkboxSelected: { backgroundColor: '#E8467A', borderColor: '#E8467A' },
-  multiOptionText: { flex: 1, fontSize: 15, color: '#334155', fontWeight: '500' },
-
-  /* Quadrant */
-  quadWrap: { gap: 10 },
-  quadOption: {
-    flexDirection: 'row', alignItems: 'center', gap: 14,
-    padding: 16, borderRadius: CARD_RADIUS, borderWidth: 1.5, borderColor: '#E2E8F0',
-    backgroundColor: '#FFF', minHeight: MIN_TOUCH_TARGET, ...SHADOW_XS,
+  resultLevel: {
+    fontSize: 24,
+    fontWeight: '800',
+    marginBottom: 12,
+    textAlign: 'center',
   },
-  quadOptionSelected: { borderColor: '#E8467A', backgroundColor: '#FFFBFC' },
-  quadDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#CBD5E1' },
-  quadDotSelected: { backgroundColor: '#E8467A' },
-  quadText: { flex: 1, fontSize: 15, fontWeight: '500', color: '#334155' },
-  quadTextSelected: { color: '#E8467A' },
-
-  /* Nav */
-  navBar: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: 20, paddingVertical: 12,
-    backgroundColor: 'rgba(255,255,255,0.92)', borderTopWidth: 1, borderTopColor: '#F1F5F9',
+  resultMessage: {
+    fontSize: 16,
+    color: THEME.colors.textSub,
+    textAlign: 'center',
+    lineHeight: 24,
+    maxWidth: '90%',
   },
-  navBarRTL: { flexDirection: 'row-reverse' },
-  navBack: {
-    flexDirection: 'row', alignItems: 'center', gap: 4,
-    paddingVertical: 12, paddingHorizontal: 8, minHeight: MIN_TOUCH_TARGET,
+  sectionBlock: {
+    marginBottom: 24,
   },
-  navBackText: { fontSize: 15, color: '#64748B', fontWeight: '500' },
-  navDisabled: { color: '#CBD5E1' },
-  navNext: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4,
-    backgroundColor: '#E8467A', borderRadius: 14, paddingVertical: 12, paddingHorizontal: 24,
-    minHeight: MIN_TOUCH_TARGET, ...SHADOW_SM,
+  sectionHeader: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: THEME.colors.textMain,
+    marginBottom: 16,
+    marginLeft: 4,
   },
-  navNextDisabled: { backgroundColor: '#CBD5E1' },
-  navNextText: { color: '#FFF', fontSize: 15, fontWeight: '700' },
-
-  /* Results */
-  resultScroll: { padding: 20, paddingBottom: 80 },
-  resultTitle: { fontSize: 26, fontWeight: '800', color: '#0F172A', marginBottom: 20, letterSpacing: -0.5 },
-  riskCard: { borderRadius: CARD_RADIUS, borderWidth: 1.5, overflow: 'hidden', marginBottom: 20, ...SHADOW_MD },
-  riskInner: { padding: 28, alignItems: 'center' },
-  riskIconCircle: { width: 72, height: 72, borderRadius: 24, justifyContent: 'center', alignItems: 'center', marginBottom: 14 },
-  riskLevel: { fontSize: 20, fontWeight: '700', marginBottom: 8, textAlign: 'center', letterSpacing: -0.3 },
-  riskMsg: { fontSize: 15, color: '#334155', lineHeight: 23, textAlign: 'center' },
-  flagsSection: { marginBottom: 20 },
-  flagItem: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8, backgroundColor: '#FFF', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: 'rgba(0,0,0,0.04)', ...SHADOW_XS },
-  flagItemRTL: { flexDirection: 'row-reverse' },
-  flagIconBg: { width: 28, height: 28, borderRadius: 10, backgroundColor: '#FFFBEB', justifyContent: 'center', alignItems: 'center' },
-  flagText: { flex: 1, fontSize: 14, color: '#334155' },
-  stepsSection: { marginBottom: 20 },
-  nextStep: { flexDirection: 'row', alignItems: 'flex-start', gap: 14, marginBottom: 14 },
-  nextStepRTL: { flexDirection: 'row-reverse' },
-  nextStepNum: { width: 32, height: 32, borderRadius: 11, justifyContent: 'center', alignItems: 'center' },
-  nextStepNumText: { color: '#FFF', fontWeight: '800', fontSize: 13 },
-  nextStepText: { flex: 1, fontSize: 14, color: '#334155', lineHeight: 22, paddingTop: 5 },
+  flagCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF2F2',
+    gap: 12,
+    paddingVertical: 16,
+  },
+  flagText: {
+    flex: 1,
+    color: '#991B1B', // Red 800
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  todoItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+    gap: 16,
+  },
+  todoCheck: {
+    marginTop: 2,
+  },
+  todoText: {
+    flex: 1,
+    fontSize: 15,
+    color: THEME.colors.textMain,
+    lineHeight: 22,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  iconBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: '#F3F4F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  infoText: {
+    color: THEME.colors.textSub,
+    fontWeight: '500',
+  },
+  outlineBtn: {
+    paddingVertical: 16,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    borderRadius: 20,
+    alignItems: 'center',
+  },
+  outlineBtnText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: THEME.colors.textSub,
+  },
 });

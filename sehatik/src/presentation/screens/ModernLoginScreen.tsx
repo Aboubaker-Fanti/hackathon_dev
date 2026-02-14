@@ -118,8 +118,8 @@ export const ModernLoginScreen: React.FC = () => {
             <View style={styles.toggleContainer}>
               <Text style={styles.toggleText}>
                 {isSignUp
-                  ? 'Don't have an account? '
-                  : 'Don't have an account? '}
+                  ? 'Don\'t have an account? '
+                  : 'Already have an account? '}
               </Text>
               <Pressable onPress={() => setIsSignUp(!isSignUp)}>
                 <Text style={styles.toggleLink}>
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: spacing.xl,
   },
-  
+
   // Header Section
   headerSection: {
     alignItems: 'center',
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     ...typography.body1Regular,
     color: colors.textSecondary,
   },
-  
+
   // Form Section
   formSection: {
     flex: 1,
@@ -253,12 +253,12 @@ const styles = StyleSheet.create({
     ...typography.body1Regular,
     color: colors.primary,
   },
-  
+
   // Submit Button
   submitButton: {
     marginTop: spacing.md,
   },
-  
+
   // Toggle Sign In/Sign Up
   toggleContainer: {
     flexDirection: 'row',
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     ...typography.body1Medium,
     color: colors.primary,
   },
-  
+
   // Divider
   dividerContainer: {
     flexDirection: 'row',
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     paddingHorizontal: spacing.md,
   },
-  
+
   // Social Login
   socialContainer: {
     flexDirection: 'row',
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.text,
   },
-  
+
   bottomSpacer: {
     height: spacing.xl,
   },

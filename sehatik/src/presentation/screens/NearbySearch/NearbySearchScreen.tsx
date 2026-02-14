@@ -386,9 +386,7 @@ export const NearbySearchScreen: React.FC<Props> = ({ onBack }) => {
                 {isArabicLang ? location.labelAr : location.label}
               </Text>
             </View>
-            <View style={styles.demoBadge}>
-              <Text style={styles.demoText}>DEMO</Text>
-            </View>
+           
           </View>
         </View>
       )}

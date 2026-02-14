@@ -30,6 +30,7 @@ interface ExamState {
   // History
   examHistory: ExamRecord[];
   lastExamDate: number | null;
+  lastScreeningDate: number | null;
 
   // Actions
   startExam: () => void;
@@ -40,6 +41,7 @@ interface ExamState {
   resetExam: () => void;
   loadHistory: () => Promise<void>;
   saveExam: (record: ExamRecord) => Promise<void>;
+  setLastScreeningDate: (date: number) => Promise<void>;
 
   // Computed
   getCurrentSection: () => ExamSection;
@@ -55,6 +57,7 @@ export const useExamStore = create<ExamState>((set, get) => ({
   examResult: null,
   examHistory: [],
   lastExamDate: null,
+  lastScreeningDate: null,
 
   startExam: () => {
     set({
@@ -183,9 +186,15 @@ export const useExamStore = create<ExamState>((set, get) => ({
       const data = await AsyncStorage.getItem(EXAM_HISTORY_KEY);
       if (data) {
         const history: ExamRecord[] = JSON.parse(data);
+
+        // Try to load last screening date from a separate key or existing logic
+        // For simplicity, we'll store it in a separate key
+        const screeningDate = await AsyncStorage.getItem('@sehatik_last_screening');
+
         set({
           examHistory: history,
           lastExamDate: history.length > 0 ? history[0].date : null,
+          lastScreeningDate: screeningDate ? parseInt(screeningDate, 10) : null,
         });
       }
     } catch {
@@ -200,6 +209,15 @@ export const useExamStore = create<ExamState>((set, get) => ({
         EXAM_HISTORY_KEY,
         JSON.stringify(state.examHistory),
       );
+    } catch {
+      // Fail silently
+    }
+  },
+
+  setLastScreeningDate: async (date: number) => {
+    try {
+      set({ lastScreeningDate: date });
+      await AsyncStorage.setItem('@sehatik_last_screening', date.toString());
     } catch {
       // Fail silently
     }

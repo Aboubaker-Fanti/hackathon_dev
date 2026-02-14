@@ -15,7 +15,8 @@
     "search": "Rechercher",
     "yes": "Oui",
     "no": "Non",
-    "ok": "OK"
+    "ok": "OK",
+    "back": "Retour"
   },
   "disclaimer": {
     "general": "Cette application ne remplace pas un avis médical professionnel. Consultez toujours un médecin pour toute préoccupation.",
@@ -53,7 +54,14 @@
     "chatDesc": "Assistant IA confidentiel",
     "centerDesc": "Près de chez vous",
     "motivTitle": "Prenez soin de vous",
-    "motivSub": "Un auto-examen régulier peut sauver des vies"
+    "motivSub": "Un auto-examen régulier peut sauver des vies",
+    "remindersTitle": "Vos Rappels",
+    "monthlyCheck": "Auto-palpation",
+    "yearlyCheck": "Examen Clinique",
+    "daysLeft": "Jours restants",
+    "daysOverdue": "Jours de retard",
+    "startNow": "Commencer",
+    "scheduleNow": "À planifier"
   },
   "autopalpation": {
     "title": "Auto-examen des seins",
@@ -110,7 +118,45 @@
     "tryDifferent": "Essayez un autre terme de recherche ou changez de catégorie",
     "showAll": "Voir tous les articles",
     "articleNotFound": "Article introuvable",
-    "relatedArticles": "Articles similaires"
+    "relatedArticles": "Articles similaires",
+    "awareness": {
+      "urgentBadge": "SENSIBILISATION URGENTE",
+      "heroTitle": "1 femme sur 8 sera touchée par le cancer du sein",
+      "heroSubtitle": "Le dépistage précoce sauve des vies. Informez-vous, agissez maintenant.",
+      "factsTitle": "Faits choquants",
+      "fact1": "Le cancer du sein est le cancer le plus fréquent chez la femme — plus de 2 millions de cas par an dans le monde",
+      "fact2": "85% des cancers du sein surviennent chez des femmes SANS antécédents familiaux",
+      "fact3": "Au Maroc, l'âge moyen au diagnostic est plus jeune qu'en Europe — la vigilance doit commencer tôt",
+      "fact4": "Détecté au stade 1, le taux de survie dépasse 95% — chaque mois compte",
+      "signsTitle": "Signes d'alerte à connaître",
+      "sign1": "Boule ou épaississement dans le sein ou sous le bras",
+      "sign2": "Changement de taille ou de forme d'un sein",
+      "sign3": "Fossette, ride ou peau d'orange sur la peau",
+      "sign4": "Rétraction ou inversion du mamelon",
+      "sign5": "Écoulement du mamelon (surtout s'il est sanglant)",
+      "sign6": "Rougeur, chaleur ou gonflement persistant",
+      "dontIgnore": "N'ignorez jamais ces signes — consultez rapidement",
+      "statsTitle": "Survie : détection précoce vs tardive",
+      "earlyDetection": "Détection précoce",
+      "lateDetection": "Détection tardive",
+      "statsMessage": "Chaque mois gagné dans le diagnostic peut faire la différence entre la vie et la mort",
+      "screeningTitle": "Le dépistage : votre meilleur allié",
+      "screeningCaption": "La mammographie sauve des vies — gratuite au Maroc pour les femmes de 45 à 69 ans",
+      "selfExamTitle": "L'auto-examen mensuel",
+      "selfExamTip": "Pratiquez l'auto-examen chaque mois, entre le 5e et le 10e jour après le début des règles. Connaître son corps est le premier pas vers la détection précoce.",
+      "storiesTitle": "Histoires vraies",
+      "story1Name": "Fatima, 42 ans",
+      "story1Badge": "Détecté tôt ✓",
+      "story1Text": "Grâce au dépistage précoce, Fatima a bénéficié d'une chirurgie conservatrice et d'un traitement léger. Aujourd'hui, elle est en pleine santé.",
+      "story2Name": "Khadija, 55 ans",
+      "story2Badge": "Diagnostic tardif ✗",
+      "story2Text": "La peur et la honte ont retardé sa consultation. Résultat : mastectomie et chimiothérapie lourde. Elle regrette d'avoir attendu.",
+      "supportQuote": "\"Vous n'êtes pas seule. La détection précoce est un acte de courage, pas de peur.\"",
+      "ctaTitle": "N'attendez pas qu'il soit trop tard",
+      "ctaSubtitle": "Chaque jour sans dépistage est un risque que vous pouvez éviter",
+      "bookScreening": "Réserver un dépistage",
+      "learnMore": "En savoir plus"
+    }
   },
   "profile": {
     "title": "Mon profil",

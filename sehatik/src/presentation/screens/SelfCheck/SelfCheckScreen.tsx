@@ -19,6 +19,7 @@ import {
   ScrollView,
   Animated,
   Platform,
+  Image,
   useWindowDimensions,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -91,6 +92,25 @@ const SHADOW_CTA = Platform.select({
 const CARD_RADIUS = 22;
 
 // ────────────────────────────────────────────────────────────
+// Image map: mediaPlaceholder → require()
+// ────────────────────────────────────────────────────────────
+
+const INSTRUCTION_IMAGES: Record<string, any> = {
+  visual_step_mirror: require('../../../../assets/selfcheck/visual_mirror.png'),
+  visual_step_arms_sides: require('../../../../assets/selfcheck/visual_arms_sides.png'),
+  visual_step_hands_hips: require('../../../../assets/selfcheck/visual_hands_hips.png'),
+  visual_step_arms_raised: require('../../../../assets/selfcheck/visual_arms_raised.png'),
+  palpation_step_finger_pads: require('../../../../assets/selfcheck/palpation_finger_pads.png'),
+  palpation_step_circular_motion: require('../../../../assets/selfcheck/palpation_circular_motion.png'),
+  palpation_step_armpit: require('../../../../assets/selfcheck/palpation_armpit.png'),
+  palpation_step_standing: require('../../../../assets/selfcheck/palpation_standing.png'),
+  palpation_step_lying: require('../../../../assets/selfcheck/palpation_lying.png'),
+  palpation_step_repeat: require('../../../../assets/selfcheck/palpation_repeat.png'),
+  nipple_step_squeeze: require('../../../../assets/selfcheck/nipple_squeeze.png'),
+  nipple_step_observe: require('../../../../assets/selfcheck/nipple_observe.png'),
+};
+
+// ────────────────────────────────────────────────────────────
 // Helper sub-components
 // ────────────────────────────────────────────────────────────
 
@@ -137,65 +157,56 @@ const ProgressBar: React.FC<{
   );
 };
 
-/** Instruction illustration — icon-based visual with layered gradient rings */
+/** Instruction illustration — shows actual image with step badge overlay */
 const InstructionVisual: React.FC<{
   icon: string;
   decorIcon?: string;
   accentColor: string;
   stepNumber: number;
   totalSteps: number;
-}> = ({ icon, decorIcon, accentColor, stepNumber, totalSteps }) => (
-  <View style={s.mediaWrapper}>
-    <LinearGradient
-      colors={[accentColor + '12', accentColor + '05']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={s.mediaGradient}
-    >
-      {/* Decorative rings */}
-      <View style={[s.mediaRing1, { borderColor: accentColor + '10' }]} />
-      <View style={[s.mediaRing2, { borderColor: accentColor + '08' }]} />
+  mediaPlaceholder?: string;
+}> = ({ icon, accentColor, stepNumber, totalSteps, mediaPlaceholder }) => {
+  const imageSource = mediaPlaceholder ? INSTRUCTION_IMAGES[mediaPlaceholder] : null;
 
-      {/* Small decorative icon */}
-      {decorIcon && (
-        <View style={s.mediaDecorIconWrap}>
-          <Ionicons
-            name={decorIcon as IoniconsName}
-            size={20}
-            color={accentColor + '28'}
+  return (
+    <View style={s.mediaWrapper}>
+      {imageSource ? (
+        <View style={s.mediaImageContainer}>
+          <Image
+            source={imageSource}
+            style={s.mediaImage}
+            resizeMode="cover"
           />
         </View>
-      )}
-
-      {/* Central icon with rings */}
-      <View style={[s.mediaIconOuter, { backgroundColor: accentColor + '12' }]}>
-        <View style={[s.mediaIconMiddle, { backgroundColor: accentColor + '10' }]}>
-          <View style={[s.mediaIconInner, { backgroundColor: '#FFFFFF' }]}>
-            <Ionicons
-              name={icon as IoniconsName}
-              size={32}
-              color={accentColor}
-            />
+      ) : (
+        <LinearGradient
+          colors={[accentColor + '12', accentColor + '05']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={s.mediaGradient}
+        >
+          <View style={[s.mediaIconOuter, { backgroundColor: accentColor + '12' }]}>
+            <View style={[s.mediaIconMiddle, { backgroundColor: accentColor + '10' }]}>
+              <View style={[s.mediaIconInner, { backgroundColor: '#FFFFFF' }]}>
+                <Ionicons
+                  name={icon as IoniconsName}
+                  size={32}
+                  color={accentColor}
+                />
+              </View>
+            </View>
           </View>
-        </View>
-      </View>
-
-      {/* Step counter badge */}
-      <View style={[s.mediaBadge, { backgroundColor: accentColor + '18' }]}>
-        <Ionicons name="ribbon-outline" size={12} color={accentColor} />
-        <Text style={[s.mediaBadgeText, { color: accentColor }]}>
-          {stepNumber}/{totalSteps}
-        </Text>
-      </View>
-
-      {/* Accent icon (top-right) */}
-      <View style={s.mediaAccent}>
-        <Ionicons name="heart-outline" size={16} color={accentColor + '20'} />
-      </View>
-    </LinearGradient>
-  </View>
-);
-
+          <View style={[s.mediaBadge, { backgroundColor: accentColor + '18' }]}>
+            <Ionicons name="ribbon-outline" size={12} color={accentColor} />
+            <Text style={[s.mediaBadgeText, { color: accentColor }]}>
+              {stepNumber}/{totalSteps}
+            </Text>
+          </View>
+        </LinearGradient>
+      )}
+    </View>
+  );
+};
 /** Modern step dots */
 const StepDots: React.FC<{
   total: number;
@@ -318,8 +329,8 @@ export const SelfCheckScreen: React.FC = () => {
   if (!isActive && !result) {
     const daysSinceCheck = lastCheckDate
       ? Math.floor(
-          (Date.now() - lastCheckDate) / (1000 * 60 * 60 * 24),
-        )
+        (Date.now() - lastCheckDate) / (1000 * 60 * 60 * 24),
+      )
       : null;
 
     return (
@@ -622,7 +633,7 @@ export const SelfCheckScreen: React.FC = () => {
                           {
                             width: `${Math.min(
                               (result.score / Math.max(result.maxScore, 1)) *
-                                100,
+                              100,
                               100,
                             )}%`,
                             backgroundColor: riskColor,
@@ -752,6 +763,19 @@ export const SelfCheckScreen: React.FC = () => {
           style={StyleSheet.absoluteFill}
         />
         <SafeAreaView style={s.container} edges={['top']}>
+          {/* Back button header */}
+          <Pressable
+            style={[s.flowBackBtn, isRTL && s.rowReverse]}
+            onPress={store.resetCheck}
+          >
+            <Ionicons
+              name={(isRTL ? 'chevron-forward' : 'chevron-back') as IoniconsName}
+              size={22}
+              color="#64748B"
+            />
+            <Text style={s.flowBackText}>{t('common.back')}</Text>
+          </Pressable>
+
           <ProgressBar
             percentage={progress.percentage}
             current={progress.current}
@@ -834,6 +858,19 @@ export const SelfCheckScreen: React.FC = () => {
         style={StyleSheet.absoluteFill}
       />
       <SafeAreaView style={s.container} edges={['top']}>
+        {/* Back button header */}
+        <Pressable
+          style={[s.flowBackBtn, isRTL && s.rowReverse]}
+          onPress={store.resetCheck}
+        >
+          <Ionicons
+            name={(isRTL ? 'chevron-forward' : 'chevron-back') as IoniconsName}
+            size={22}
+            color="#64748B"
+          />
+          <Text style={s.flowBackText}>{t('common.back')}</Text>
+        </Pressable>
+
         <ProgressBar
           percentage={progress.percentage}
           current={progress.current}
@@ -865,6 +902,7 @@ export const SelfCheckScreen: React.FC = () => {
             accentColor={step.accentColor}
             stepNumber={currentInstructionIndex + 1}
             totalSteps={step.instructions.length}
+            mediaPlaceholder={instruction.mediaPlaceholder}
           />
 
           <View
@@ -967,6 +1005,21 @@ const s = StyleSheet.create({
   rootBg: { flex: 1 },
   container: { flex: 1 },
   textRTL: { textAlign: 'right', writingDirection: 'rtl' },
+
+  /* ─── Flow Back Button ─── */
+  flowBackBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    gap: 4,
+  },
+  flowBackText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#64748B',
+    letterSpacing: -0.2,
+  },
   rowReverse: { flexDirection: 'row-reverse' },
 
   /* ─── Progress Bar ─── */
@@ -1279,6 +1332,24 @@ const s = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: spacing.lg,
     ...SHADOW_SM,
+  },
+  mediaImageContainer: {
+    width: '100%',
+    height: 240,
+    borderRadius: CARD_RADIUS,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  mediaImage: {
+    width: '100%',
+    height: '100%',
+  },
+  mediaImageOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 60,
   },
   mediaGradient: {
     width: '100%',

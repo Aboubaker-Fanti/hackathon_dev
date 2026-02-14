@@ -1,889 +1,718 @@
 /**
- * Education Screen - Hub for breast health learning
- * Beautiful, user-friendly design with featured articles,
- * search, category filters, and polished article cards
+ * Education Screen — Breast Cancer Awareness Hub
+ * "Premium Pink" Redesign with Video Integration
  */
 
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
-  FlatList,
-  TextInput,
-  Animated,
-  Dimensions,
   ScrollView,
+  Image,
+  Dimensions,
+  Platform,
+  Animated,
+  Pressable,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { useLanguageStore } from '../../../application/store/languageStore';
-import {
-  EDUCATION_ARTICLES,
-  getArticlesByCategory,
-  type Article,
-} from '../../../infrastructure/data/educationContent';
 import { colors } from '../../theme/colors';
-import { spacing, borderRadius, MIN_TOUCH_TARGET } from '../../theme/spacing';
-import { fontSizes, fontWeights } from '../../theme/typography';
 
+/* ------------------------------------------------------------------ */
+/* Constants                                                          */
+/* ------------------------------------------------------------------ */
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const CARD_HORIZONTAL_PAD = 24;
+
+/* ------------------------------------------------------------------ */
+/* Image Assets                                                       */
+/* ------------------------------------------------------------------ */
+const IMAGES = {
+  hero: require('../../../../assets/education/hero_awareness.png'),
+  earlySigns: require('../../../../assets/education/early_signs.png'),
+  mammogram: require('../../../../assets/education/mammogram.png'),
+  selfExam: require('../../../../assets/education/self_exam.png'),
+  survivalStats: require('../../../../assets/education/survival_stats.png'),
+  support: require('../../../../assets/education/support.png'),
+  visualExplanation: require('../../../../assets/education/visual_explanation_illustration.png'),
+};
+
+/* ------------------------------------------------------------------ */
+/* Props                                                              */
+/* ------------------------------------------------------------------ */
 interface Props {
   onArticlePress?: (articleId: string) => void;
 }
 
-const CATEGORIES = [
-  { id: 'all', titleKey: 'education.categories.all', icon: '📚', color: '#6C5CE7', bgColor: '#6C5CE710' },
-  { id: 'whatIs', titleKey: 'education.categories.whatIs', icon: '🎗️', color: colors.primary, bgColor: colors.primary + '10' },
-  { id: 'detection', titleKey: 'education.categories.detection', icon: '🔍', color: colors.success, bgColor: colors.success + '10' },
-  { id: 'signs', titleKey: 'education.categories.signs', icon: '⚠️', color: colors.warning, bgColor: colors.warning + '10' },
-  { id: 'treatment', titleKey: 'education.categories.treatment', icon: '💊', color: colors.secondary, bgColor: colors.secondary + '10' },
-  { id: 'stories', titleKey: 'education.categories.stories', icon: '💬', color: '#E91E63', bgColor: '#E91E6310' },
-  { id: 'myths', titleKey: 'education.categories.myths', icon: '🚫', color: '#E67E22', bgColor: '#E67E2210' },
-  { id: 'faq', titleKey: 'education.categories.faq', icon: '❓', color: '#6C5CE7', bgColor: '#6C5CE710' },
-];
+/* ------------------------------------------------------------------ */
+/* Animated fade-in wrapper                                           */
+/* ------------------------------------------------------------------ */
+const FadeIn: React.FC<{ delay?: number; children: React.ReactNode }> = ({
+  delay = 0,
+  children,
+}) => {
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(20)).current;
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const FEATURED_CARD_WIDTH = SCREEN_WIDTH - spacing.lg * 2;
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 800,
+        delay,
+        useNativeDriver: true,
+      }),
+      Animated.spring(translateY, {
+        toValue: 0,
+        delay,
+        useNativeDriver: true,
+        damping: 20,
+        stiffness: 90,
+      }),
+    ]).start();
+  }, []);
 
-/** Pick a few featured articles to highlight at the top */
-const FEATURED_IDS = ['what_is_breast_cancer', 'early_detection', 'early_signs'];
+  return (
+    <Animated.View style={{ opacity, transform: [{ translateY }] }}>
+      {children}
+    </Animated.View>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/* Pressable card with scale animation                                */
+/* ------------------------------------------------------------------ */
+const PressCard: React.FC<{
+  children: React.ReactNode;
+  onPress?: () => void;
+  style?: any;
+}> = ({ children, onPress, style }) => {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const pressIn = useCallback(() => {
+    Animated.spring(scale, {
+      toValue: 0.98,
+      useNativeDriver: true,
+      speed: 40,
+      bounciness: 5,
+    }).start();
+  }, [scale]);
+
+  const pressOut = useCallback(() => {
+    Animated.spring(scale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 40,
+      bounciness: 5,
+    }).start();
+  }, [scale]);
+
+  return (
+    <Pressable onPress={onPress} onPressIn={pressIn} onPressOut={pressOut}>
+      <Animated.View style={[style, { transform: [{ scale }] }]}>
+        {children}
+      </Animated.View>
+    </Pressable>
+  );
+};
+
+/* ================================================================== */
+/* Main Component                                                     */
+/* ================================================================== */
 
 export const EducationScreen: React.FC<Props> = ({ onArticlePress }) => {
   const { t } = useTranslation();
   const { isRTL } = useLanguageStore();
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const scrollY = useRef(new Animated.Value(0)).current;
+  const rtlText = isRTL ? s.textRTL : undefined;
 
-  // Featured articles
-  const featuredArticles = useMemo(
-    () => EDUCATION_ARTICLES.filter((a) => FEATURED_IDS.includes(a.id)),
-    [],
-  );
+  /* ---- Shocking Facts Data ---- */
+  const shockingFacts = [
+    {
+      icon: '⚡',
+      textKey: 'education.awareness.fact1',
+      color: colors.primaryDark,
+      bgColor: '#FCE4EC',
+    },
+    {
+      icon: '🧬',
+      textKey: 'education.awareness.fact2',
+      color: '#7C3AED',
+      bgColor: '#F3E8FF',
+    },
+    {
+      icon: '🌍',
+      textKey: 'education.awareness.fact3',
+      color: '#059669',
+      bgColor: '#ECFDF5',
+    },
+    {
+      icon: '⏳',
+      textKey: 'education.awareness.fact4',
+      color: '#B45309',
+      bgColor: '#FFFBEB',
+    },
+  ];
 
-  // Filtered articles based on category + search
-  const filteredArticles = useMemo(() => {
-    let articles =
-      selectedCategory === 'all'
-        ? EDUCATION_ARTICLES
-        : getArticlesByCategory(selectedCategory);
-
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase().trim();
-      articles = articles.filter(
-        (a) =>
-          t(a.titleKey).toLowerCase().includes(query) ||
-          t(a.summaryKey).toLowerCase().includes(query),
-      );
-    }
-
-    return articles;
-  }, [selectedCategory, searchQuery, t]);
-
-  // Article count per category
-  const getCategoryCount = (categoryId: string) => {
-    if (categoryId === 'all') return EDUCATION_ARTICLES.length;
-    return getArticlesByCategory(categoryId).length;
-  };
-
-  const getCategoryMeta = (categoryId: string) => {
-    return CATEGORIES.find((c) => c.id === categoryId);
-  };
-
-  // ---- Render Functions ----
-
-  const renderFeaturedCard = ({ item, index }: { item: Article; index: number }) => {
-    const category = getCategoryMeta(item.category);
-    const gradientColors = [
-      { from: '#FF6B9D', to: '#FF8FB5' },
-      { from: '#9B59B6', to: '#B07CC6' },
-      { from: '#27AE60', to: '#2ECC71' },
-    ];
-    const gradient = gradientColors[index % gradientColors.length];
-
-    return (
-      <TouchableOpacity
-        style={[styles.featuredCard, { backgroundColor: gradient.from }]}
-        onPress={() => onArticlePress?.(item.id)}
-        activeOpacity={0.85}
-        accessibilityRole="button"
-        accessibilityLabel={t(item.titleKey)}
-      >
-        {/* Decorative circles */}
-        <View style={[styles.featuredCircle1, { backgroundColor: gradient.to }]} />
-        <View style={[styles.featuredCircle2, { backgroundColor: gradient.to }]} />
-
-        <View style={styles.featuredContent}>
-          {/* Category badge */}
-          <View style={styles.featuredBadge}>
-            <Text style={styles.featuredBadgeIcon}>{category?.icon}</Text>
-            <Text style={styles.featuredBadgeText}>{t(category?.titleKey || '')}</Text>
-          </View>
-
-          {/* Title & Summary */}
-          <Text style={[styles.featuredTitle, isRTL && styles.textRTL]} numberOfLines={2}>
-            {t(item.titleKey)}
-          </Text>
-          <Text style={[styles.featuredSummary, isRTL && styles.textRTL]} numberOfLines={2}>
-            {t(item.summaryKey)}
-          </Text>
-
-          {/* Read time & CTA */}
-          <View style={[styles.featuredFooter, isRTL && styles.rowReverse]}>
-            <View style={styles.featuredReadTime}>
-              <Text style={styles.featuredReadTimeIcon}>🕐</Text>
-              <Text style={styles.featuredReadTimeText}>
-                {t('education.duration', { minutes: item.readTimeMinutes })}
-              </Text>
-            </View>
-            <View style={styles.featuredCTA}>
-              <Text style={styles.featuredCTAText}>{t('education.readArticle')}</Text>
-              <Text style={styles.featuredCTAArrow}>{isRTL ? '←' : '→'}</Text>
-            </View>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
-  const renderArticleCard = ({ item, index }: { item: Article; index: number }) => {
-    const category = getCategoryMeta(item.category);
-    const accentColor = category?.color || colors.primary;
-
-    return (
-      <TouchableOpacity
-        style={[styles.articleCard]}
-        onPress={() => onArticlePress?.(item.id)}
-        activeOpacity={0.7}
-        accessibilityRole="button"
-        accessibilityLabel={t(item.titleKey)}
-      >
-        {/* Left accent bar */}
-        <View style={[styles.articleAccent, { backgroundColor: accentColor }]} />
-
-        <View style={[styles.articleInner, isRTL && styles.rowReverse]}>
-          {/* Icon container */}
-          <View style={[styles.articleIconBox, { backgroundColor: accentColor + '12' }]}>
-            <Text style={styles.articleIconText}>{item.icon}</Text>
-          </View>
-
-          {/* Text content */}
-          <View style={styles.articleTextContent}>
-            {/* Category tag */}
-            <View style={[styles.articleCategoryTag, isRTL && styles.rowReverse]}>
-              <View style={[styles.articleCategoryDot, { backgroundColor: accentColor }]} />
-              <Text style={[styles.articleCategoryLabel, { color: accentColor }]}>
-                {t(category?.titleKey || '')}
-              </Text>
-            </View>
-
-            <Text
-              style={[styles.articleTitle, isRTL && styles.textRTL]}
-              numberOfLines={2}
-            >
-              {t(item.titleKey)}
-            </Text>
-            <Text
-              style={[styles.articleSummary, isRTL && styles.textRTL]}
-              numberOfLines={2}
-            >
-              {t(item.summaryKey)}
-            </Text>
-
-            {/* Footer */}
-            <View style={[styles.articleFooter, isRTL && styles.rowReverse]}>
-              <View style={[styles.articleReadTime, isRTL && styles.rowReverse]}>
-                <Text style={styles.articleReadTimeIcon}>🕐</Text>
-                <Text style={styles.articleReadTimeText}>
-                  {t('education.duration', { minutes: item.readTimeMinutes })}
-                </Text>
-              </View>
-              <Text style={styles.articleSections}>
-                {item.contentSections.length} {t('education.sections')}
-              </Text>
-            </View>
-          </View>
-
-          {/* Arrow */}
-          <View style={styles.articleArrowContainer}>
-            <Text style={[styles.articleArrow, { color: accentColor }]}>
-              {isRTL ? '‹' : '›'}
-            </Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+  /* ---- Warning Signs Data ---- */
+  const warningSigns = [
+    { icon: '🔴', textKey: 'education.awareness.sign1' },
+    { icon: '🟠', textKey: 'education.awareness.sign2' },
+    { icon: '🟡', textKey: 'education.awareness.sign3' },
+    { icon: '🟣', textKey: 'education.awareness.sign4' },
+    { icon: '🔵', textKey: 'education.awareness.sign5' },
+    { icon: '⚫', textKey: 'education.awareness.sign6' },
+  ];
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <Animated.ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false },
-        )}
-        scrollEventThrottle={16}
-      >
-        {/* ===== Header ===== */}
-        <View style={styles.header}>
-          <View style={[styles.headerTop, isRTL && styles.rowReverse]}>
-            <View style={styles.headerTextBlock}>
-              <Text style={[styles.headerTitle, isRTL && styles.textRTL]}>
+    <View style={s.root}>
+      <SafeAreaView style={s.safe} edges={['top']}>
+        <ScrollView
+          contentContainerStyle={s.scroll}
+          showsVerticalScrollIndicator={false}
+          bounces
+        >
+          {/* ═══════ HEADER ═══════ */}
+          <View style={[s.header, isRTL && s.rowRTL]}>
+            <View>
+              <Text style={[s.headerTitle, rtlText]}>
                 {t('education.title')}
               </Text>
-              <Text style={[styles.headerSubtitle, isRTL && styles.textRTL]}>
+              <Text style={[s.headerSubtitle, rtlText]}>
                 {t('education.subtitle')}
               </Text>
             </View>
-            <View style={styles.headerIconContainer}>
-              <Text style={styles.headerIcon}>📚</Text>
+            <View style={s.headerIcon}>
+              <Ionicons name="ribbon" size={28} color={colors.primary} />
             </View>
           </View>
 
-          {/* Article count */}
-          <View style={[styles.statsRow, isRTL && styles.rowReverse]}>
-            <View style={styles.statBadge}>
-              <Text style={styles.statNumber}>{EDUCATION_ARTICLES.length}</Text>
-              <Text style={styles.statLabel}>{t('education.articles')}</Text>
-            </View>
-            <View style={styles.statBadge}>
-              <Text style={styles.statNumber}>{CATEGORIES.length - 1}</Text>
-              <Text style={styles.statLabel}>{t('education.topics')}</Text>
-            </View>
-            <View style={styles.statBadge}>
-              <Text style={styles.statNumber}>3</Text>
-              <Text style={styles.statLabel}>{t('education.languages')}</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* ===== Search Bar ===== */}
-        <View style={styles.searchSection}>
-          <View style={[
-            styles.searchContainer,
-            isSearchFocused && styles.searchContainerFocused,
-            isRTL && styles.rowReverse,
-          ]}>
-            <Text style={styles.searchIcon}>🔍</Text>
-            <TextInput
-              style={[styles.searchInput, isRTL && styles.textRTL]}
-              placeholder={t('education.searchPlaceholder')}
-              placeholderTextColor={colors.textLight}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => setIsSearchFocused(false)}
-              returnKeyType="search"
-              autoCorrect={false}
-            />
-            {searchQuery.length > 0 && (
-              <TouchableOpacity
-                onPress={() => setSearchQuery('')}
-                style={styles.searchClear}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          {/* ═══════ HERO BANNER ═══════ */}
+          <FadeIn>
+            <PressCard style={s.heroCard} onPress={() => onArticlePress?.('what_is_breast_cancer')}>
+              <Image source={IMAGES.hero} style={s.heroImage} />
+              <LinearGradient
+                colors={['transparent', 'rgba(0,0,0,0.7)']}
+                style={s.heroOverlay}
               >
-                <Text style={styles.searchClearText}>✕</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-
-        {/* ===== Featured Section (only if no search query) ===== */}
-        {!searchQuery.trim() && selectedCategory === 'all' && (
-          <View style={styles.featuredSection}>
-            <View style={[styles.sectionHeader, isRTL && styles.rowReverse]}>
-              <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
-                {t('education.featured')}
-              </Text>
-              <View style={styles.sectionTitleAccent} />
-            </View>
-            <FlatList
-              data={featuredArticles}
-              renderItem={renderFeaturedCard}
-              keyExtractor={(item) => `featured-${item.id}`}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.featuredList}
-              snapToInterval={FEATURED_CARD_WIDTH + spacing.md}
-              decelerationRate="fast"
-              pagingEnabled={false}
-            />
-          </View>
-        )}
-
-        {/* ===== Category Filters ===== */}
-        <View style={styles.categorySection}>
-          <View style={[styles.sectionHeader, isRTL && styles.rowReverse]}>
-            <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
-              {t('education.categories.title')}
-            </Text>
-            <View style={styles.sectionTitleAccent} />
-          </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.categoryList}
-          >
-            {CATEGORIES.map((cat) => {
-              const isSelected = selectedCategory === cat.id;
-              const count = getCategoryCount(cat.id);
-              return (
-                <TouchableOpacity
-                  key={cat.id}
-                  style={[
-                    styles.categoryChip,
-                    isSelected && { backgroundColor: cat.color, borderColor: cat.color },
-                  ]}
-                  onPress={() => setSelectedCategory(cat.id)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.categoryIcon}>{cat.icon}</Text>
-                  <Text
-                    style={[
-                      styles.categoryText,
-                      isSelected && styles.categoryTextActive,
-                    ]}
-                  >
-                    {t(cat.titleKey)}
+                <View style={s.urgentBadge}>
+                  <Text style={s.urgentBadgeText}>
+                    {t('education.awareness.urgentBadge')}
                   </Text>
-                  <View
-                    style={[
-                      styles.categoryCount,
-                      isSelected && styles.categoryCountActive,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.categoryCountText,
-                        isSelected && styles.categoryCountTextActive,
-                      ]}
-                    >
-                      {count}
+                </View>
+                <Text style={[s.heroTitle, rtlText]}>
+                  {t('education.awareness.heroTitle')}
+                </Text>
+              </LinearGradient>
+            </PressCard>
+          </FadeIn>
+
+          {/* ═══════ VISUAL EXPLANATION (IMAGE) ═══════ */}
+          <FadeIn delay={100}>
+            <View style={s.section}>
+              <View style={[s.sectionHeader, isRTL && s.rowRTL]}>
+                <Ionicons name="eye" size={24} color={colors.primary} />
+                <Text style={[s.sectionTitle, rtlText]}>
+                  Visual Explanation
+                </Text>
+              </View>
+
+              <PressCard style={s.contentCard} onPress={() => onArticlePress?.('what_is_breast_cancer')}>
+                <Image source={IMAGES.visualExplanation} style={s.cardImage} />
+              </PressCard>
+            </View>
+          </FadeIn>
+
+          {/* ═══════ SHOCKING FACTS ═══════ */}
+          <FadeIn delay={200}>
+            <View style={s.section}>
+              <View style={[s.sectionHeader, isRTL && s.rowRTL]}>
+                <Ionicons name="information-circle" size={24} color={colors.primary} />
+                <Text style={[s.sectionTitle, rtlText]}>
+                  {t('education.awareness.factsTitle')}
+                </Text>
+              </View>
+
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={[s.factsScroll, isRTL && s.rowRTL]}
+                decelerationRate="fast"
+                snapToInterval={SCREEN_WIDTH * 0.75 + 16}
+              >
+                {shockingFacts.map((fact, idx) => (
+                  <PressCard key={idx} style={[s.factCard, { backgroundColor: fact.bgColor }]}>
+                    <Text style={s.factIcon}>{fact.icon}</Text>
+                    <Text style={[s.factText, { color: fact.color }, rtlText]}>
+                      {t(fact.textKey)}
+                    </Text>
+                  </PressCard>
+                ))}
+              </ScrollView>
+            </View>
+          </FadeIn>
+
+          {/* ═══════ EARLY SIGNS ═══════ */}
+          <FadeIn delay={300}>
+            <View style={s.section}>
+              <View style={[s.sectionHeader, isRTL && s.rowRTL]}>
+                <Ionicons name="warning" size={24} color={colors.warning} />
+                <Text style={[s.sectionTitle, rtlText]}>
+                  {t('education.awareness.signsTitle')}
+                </Text>
+              </View>
+
+              <PressCard style={s.contentCard} onPress={() => onArticlePress?.('early_signs')}>
+                <Image source={IMAGES.earlySigns} style={s.cardImage} />
+
+                <View style={s.signsGrid}>
+                  {warningSigns.map((sign, idx) => (
+                    <View key={idx} style={[s.signItem, isRTL && s.rowRTL]}>
+                      <Text style={s.signIcon}>{sign.icon}</Text>
+                      <Text style={[s.signText, rtlText]}>{t(sign.textKey)}</Text>
+                    </View>
+                  ))}
+                </View>
+
+                <View style={[s.alertBox, isRTL && s.rowRTL]}>
+                  <Ionicons name="alert-circle" size={20} color="#D32F2F" />
+                  <Text style={[s.alertText, rtlText]}>
+                    {t('education.awareness.dontIgnore')}
+                  </Text>
+                </View>
+              </PressCard>
+            </View>
+          </FadeIn>
+
+          {/* ═══════ SURVIVAL STATS ═══════ */}
+          <FadeIn delay={400}>
+            <View style={s.section}>
+              <View style={[s.sectionHeader, isRTL && s.rowRTL]}>
+                <Ionicons name="stats-chart" size={24} color={colors.success} />
+                <Text style={[s.sectionTitle, rtlText]}>
+                  {t('education.awareness.statsTitle')}
+                </Text>
+              </View>
+
+              <PressCard style={s.contentCard} onPress={() => onArticlePress?.('treatment_prognosis')}>
+                <Image source={IMAGES.survivalStats} style={s.cardImage} />
+                <View style={s.cardContent}>
+                  <Text style={[s.cardCaption, rtlText]}>
+                    {t('education.awareness.statsMessage')}
+                  </Text>
+                </View>
+              </PressCard>
+            </View>
+          </FadeIn>
+
+          {/* ═══════ REAL STORIES ═══════ */}
+          <FadeIn delay={500}>
+            <View style={s.section}>
+              <View style={[s.sectionHeader, isRTL && s.rowRTL]}>
+                <Ionicons name="heart" size={24} color={colors.primary} />
+                <Text style={[s.sectionTitle, rtlText]}>
+                  {t('education.awareness.storiesTitle')}
+                </Text>
+              </View>
+
+              <PressCard style={s.contentCard} onPress={() => onArticlePress?.('real_stories')}>
+                {/* Fatima */}
+                <View style={[s.storyItem, isRTL && s.rowRTL]}>
+                  <View style={[s.storyAvatar, { backgroundColor: '#E8F5E9' }]}>
+                    <Text style={{ fontSize: 18 }}>👩🏽</Text>
+                  </View>
+                  <View style={{ flex: 1, gap: 4 }}>
+                    <View style={[s.storyHeaderRow, isRTL && s.rowRTL]}>
+                      <Text style={[s.storyName, rtlText]}>{t('education.awareness.story1Name')}</Text>
+                      <View style={[s.badge, { backgroundColor: '#E8F5E9' }]}>
+                        <Text style={[s.badgeText, { color: '#2E7D32' }]}>{t('education.awareness.story1Badge')}</Text>
+                      </View>
+                    </View>
+                    <Text style={[s.storyText, rtlText]} numberOfLines={3}>
+                      {t('education.awareness.story1Text')}
                     </Text>
                   </View>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </View>
+                </View>
 
-        {/* ===== Articles List ===== */}
-        <View style={styles.articlesSection}>
-          <View style={[styles.sectionHeader, isRTL && styles.rowReverse]}>
-            <Text style={[styles.sectionTitle, isRTL && styles.textRTL]}>
-              {searchQuery.trim()
-                ? t('education.searchResults')
-                : selectedCategory === 'all'
-                  ? t('education.allArticles')
-                  : t(getCategoryMeta(selectedCategory)?.titleKey || '')}
-            </Text>
-            <Text style={styles.articlesCount}>
-              {filteredArticles.length} {t('education.articles')}
-            </Text>
-          </View>
+                <View style={s.divider} />
 
-          {filteredArticles.length > 0 ? (
-            filteredArticles.map((article, index) => (
-              <View key={article.id}>
-                {renderArticleCard({ item: article, index })}
-              </View>
-            ))
-          ) : (
-            <View style={styles.emptyState}>
-              <View style={styles.emptyIconContainer}>
-                <Text style={styles.emptyIcon}>📄</Text>
-              </View>
-              <Text style={[styles.emptyTitle, isRTL && styles.textRTL]}>
-                {t('education.noResults')}
-              </Text>
-              <Text style={[styles.emptySubtitle, isRTL && styles.textRTL]}>
-                {t('education.tryDifferent')}
-              </Text>
-              <TouchableOpacity
-                style={styles.emptyButton}
-                onPress={() => {
-                  setSearchQuery('');
-                  setSelectedCategory('all');
-                }}
-              >
-                <Text style={styles.emptyButtonText}>{t('education.showAll')}</Text>
-              </TouchableOpacity>
+                {/* Khadija */}
+                <View style={[s.storyItem, isRTL && s.rowRTL]}>
+                  <View style={[s.storyAvatar, { backgroundColor: '#FFHBEE' }]}>
+                    <Text style={{ fontSize: 18 }}>👵🏽</Text>
+                  </View>
+                  <View style={{ flex: 1, gap: 4 }}>
+                    <View style={[s.storyHeaderRow, isRTL && s.rowRTL]}>
+                      <Text style={[s.storyName, rtlText]}>{t('education.awareness.story2Name')}</Text>
+                      <View style={[s.badge, { backgroundColor: '#FFEBEE' }]}>
+                        <Text style={[s.badgeText, { color: '#C62828' }]}>{t('education.awareness.story2Badge')}</Text>
+                      </View>
+                    </View>
+                    <Text style={[s.storyText, rtlText]} numberOfLines={3}>
+                      {t('education.awareness.story2Text')}
+                    </Text>
+                  </View>
+                </View>
+              </PressCard>
             </View>
-          )}
-        </View>
-      </Animated.ScrollView>
-    </SafeAreaView>
+          </FadeIn>
+
+          {/* ═══════ CTA SECTION ═══════ */}
+          <FadeIn delay={600}>
+            <View style={s.ctaContainer}>
+              <LinearGradient
+                colors={[colors.primary, colors.primaryDark]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={s.ctaGradient}
+              >
+                <Text style={[s.ctaTitle, rtlText]}>
+                  {t('education.awareness.ctaTitle')}
+                </Text>
+                <Text style={[s.ctaSubtitle, rtlText]}>
+                  {t('education.awareness.ctaSubtitle')}
+                </Text>
+
+                <TouchableOpacity
+                  style={s.ctaButton}
+                  onPress={() => onArticlePress?.('early_detection')}
+                  activeOpacity={0.9}
+                >
+                  <Text style={s.ctaButtonText}>
+                    {t('education.awareness.bookScreening')}
+                  </Text>
+                  <Ionicons name={isRTL ? "arrow-back" : "arrow-forward"} size={20} color={colors.primary} />
+                </TouchableOpacity>
+              </LinearGradient>
+            </View>
+          </FadeIn>
+
+          <View style={{ height: 40 }} />
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
+/* ================================================================== */
+/* Styles                                                             */
+/* ================================================================== */
+
+const s = StyleSheet.create({
+  root: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.backgroundPink, // Soft pink background
   },
-  scrollContent: {
-    paddingBottom: spacing.xxxl,
+  safe: {
+    flex: 1,
+  },
+  scroll: {
+    paddingBottom: 24,
   },
   textRTL: {
-    textAlign: 'right',
-    writingDirection: 'rtl',
+    textAlign: 'right' as const,
+    writingDirection: 'rtl' as const,
   },
-  rowReverse: {
-    flexDirection: 'row-reverse',
+  rowRTL: {
+    flexDirection: 'row-reverse' as const,
   },
 
-  // ===== Header =====
+  /* ---- Header ---- */
   header: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.md,
-  },
-  headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.lg,
-  },
-  headerTextBlock: {
-    flex: 1,
+    paddingHorizontal: CARD_HORIZONTAL_PAD,
+    paddingVertical: 16,
   },
   headerTitle: {
-    fontSize: fontSizes.xxxl,
-    fontWeight: fontWeights.bold,
+    fontSize: 28,
+    fontWeight: '800',
     color: colors.text,
-    marginBottom: spacing.xs,
+    letterSpacing: -0.5,
   },
   headerSubtitle: {
-    fontSize: fontSizes.md,
+    fontSize: 15,
     color: colors.textSecondary,
-    lineHeight: fontSizes.md * 1.5,
-  },
-  headerIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.primary + '15',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: spacing.md,
+    fontWeight: '500',
   },
   headerIcon: {
-    fontSize: 28,
-  },
-
-  // Stats row
-  statsRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  statBadge: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.md,
-    paddingVertical: spacing.sm + 2,
-    paddingHorizontal: spacing.sm,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  statNumber: {
-    fontSize: fontSizes.xl,
-    fontWeight: fontWeights.bold,
-    color: colors.primary,
-  },
-  statLabel: {
-    fontSize: fontSizes.xs,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-
-  // ===== Search =====
-  searchSection: {
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.md,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    paddingHorizontal: spacing.md,
-    height: 50,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    gap: spacing.sm,
-  },
-  searchContainerFocused: {
-    borderColor: colors.primary,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  searchIcon: {
-    fontSize: 18,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: fontSizes.md,
-    color: colors.text,
-    paddingVertical: 0,
-  },
-  searchClear: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: colors.border,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#FFF',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  searchClearText: {
-    fontSize: fontSizes.xs,
-    color: colors.textSecondary,
-    fontWeight: fontWeights.bold,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
   },
 
-  // ===== Featured Section =====
-  featuredSection: {
-    marginBottom: spacing.lg,
+  /* ---- Hero ---- */
+  heroCard: {
+    marginHorizontal: CARD_HORIZONTAL_PAD,
+    height: 220,
+    borderRadius: 24,
+    overflow: 'hidden',
+    backgroundColor: '#000',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  heroOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 140,
+    justifyContent: 'flex-end',
+    padding: 20,
+  },
+  urgentBadge: {
+    backgroundColor: colors.primary,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  urgentBadgeText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+  heroTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#FFF',
+    lineHeight: 28,
+  },
+
+  /* ---- Sections ---- */
+  section: {
+    marginTop: 24,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    marginBottom: spacing.md,
-    gap: spacing.sm,
+    paddingHorizontal: CARD_HORIZONTAL_PAD,
+    marginBottom: 12,
+    gap: 8,
   },
   sectionTitle: {
-    fontSize: fontSizes.lg,
-    fontWeight: fontWeights.bold,
+    fontSize: 18,
+    fontWeight: '700',
     color: colors.text,
   },
-  sectionTitleAccent: {
-    flex: 1,
-    height: 2,
-    backgroundColor: colors.border,
-    borderRadius: 1,
-  },
-  featuredList: {
-    paddingHorizontal: spacing.lg,
-    gap: spacing.md,
-  },
-  featuredCard: {
-    width: FEATURED_CARD_WIDTH,
-    borderRadius: borderRadius.xl,
-    padding: spacing.lg,
-    minHeight: 200,
+
+  /* ---- Video ---- */
+  videoCard: {
+    marginHorizontal: CARD_HORIZONTAL_PAD,
+    height: 200,
+    borderRadius: 20,
     overflow: 'hidden',
-    justifyContent: 'flex-end',
+    backgroundColor: '#000',
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    elevation: 4,
   },
-  featuredCircle1: {
-    position: 'absolute',
-    top: -30,
-    right: -30,
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    opacity: 0.3,
-  },
-  featuredCircle2: {
-    position: 'absolute',
-    bottom: -20,
-    left: -20,
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    opacity: 0.2,
-  },
-  featuredContent: {
-    zIndex: 1,
-  },
-  featuredBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    borderRadius: borderRadius.round,
-    paddingHorizontal: spacing.sm + 2,
-    paddingVertical: spacing.xs,
-    gap: spacing.xs,
-    marginBottom: spacing.md,
-  },
-  featuredBadgeIcon: {
-    fontSize: 14,
-  },
-  featuredBadgeText: {
-    fontSize: fontSizes.xs,
-    fontWeight: fontWeights.semiBold,
-    color: '#FFFFFF',
-  },
-  featuredTitle: {
-    fontSize: fontSizes.xxl,
-    fontWeight: fontWeights.bold,
-    color: '#FFFFFF',
-    marginBottom: spacing.sm,
-    lineHeight: fontSizes.xxl * 1.25,
-  },
-  featuredSummary: {
-    fontSize: fontSizes.sm,
-    color: 'rgba(255,255,255,0.85)',
-    lineHeight: fontSizes.sm * 1.5,
-    marginBottom: spacing.md,
-  },
-  featuredFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  featuredReadTime: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  featuredReadTimeIcon: {
-    fontSize: 14,
-  },
-  featuredReadTimeText: {
-    fontSize: fontSizes.xs,
-    color: 'rgba(255,255,255,0.8)',
-    fontWeight: fontWeights.medium,
-  },
-  featuredCTA: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.25)',
-    borderRadius: borderRadius.round,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs + 2,
-    gap: spacing.xs,
-  },
-  featuredCTAText: {
-    fontSize: fontSizes.sm,
-    fontWeight: fontWeights.semiBold,
-    color: '#FFFFFF',
-  },
-  featuredCTAArrow: {
-    fontSize: fontSizes.md,
-    color: '#FFFFFF',
-    fontWeight: fontWeights.bold,
+  video: {
+    width: '100%',
+    height: '100%',
   },
 
-  // ===== Category Filters =====
-  categorySection: {
-    marginBottom: spacing.lg,
+  /* ---- Facts ---- */
+  factsScroll: {
+    paddingHorizontal: CARD_HORIZONTAL_PAD,
+    gap: 12,
   },
-  categoryList: {
-    paddingHorizontal: spacing.lg,
-    gap: spacing.sm,
+  factCard: {
+    width: SCREEN_WIDTH * 0.75,
+    padding: 20,
+    borderRadius: 20,
+    flexDirection: 'row',
+    gap: 16,
+    alignItems: 'center',
   },
-  categoryChip: {
+  factIcon: {
+    fontSize: 32,
+  },
+  factText: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: '600',
+    lineHeight: 22,
+  },
+
+  /* ---- Content Cards (White) ---- */
+  contentCard: {
+    marginHorizontal: CARD_HORIZONTAL_PAD,
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    overflow: 'hidden',
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(0,0,0,0.03)',
+  },
+  cardImage: {
+    width: '100%',
+    height: 180,
+    resizeMode: 'cover',
+  },
+  cardContent: {
+    padding: 16,
+  },
+  cardCaption: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    fontWeight: '500',
+    lineHeight: 20,
+    textAlign: 'center',
+  },
+
+  /* ---- Signs Grid ---- */
+  signsGrid: {
+    padding: 16,
+    gap: 8,
+  },
+  signItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs + 2,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm + 2,
-    borderRadius: borderRadius.round,
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    minHeight: 42,
+    gap: 12,
+    paddingVertical: 4,
   },
-  categoryIcon: {
+  signIcon: {
     fontSize: 16,
   },
-  categoryText: {
-    fontSize: fontSizes.sm,
-    fontWeight: fontWeights.medium,
-    color: colors.textSecondary,
-  },
-  categoryTextActive: {
-    color: colors.textOnPrimary,
-    fontWeight: fontWeights.bold,
-  },
-  categoryCount: {
-    backgroundColor: colors.border,
-    borderRadius: borderRadius.round,
-    minWidth: 22,
-    height: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 6,
-  },
-  categoryCountActive: {
-    backgroundColor: 'rgba(255,255,255,0.3)',
-  },
-  categoryCountText: {
-    fontSize: fontSizes.xs - 1,
-    fontWeight: fontWeights.bold,
-    color: colors.textSecondary,
-  },
-  categoryCountTextActive: {
-    color: '#FFFFFF',
-  },
-
-  // ===== Articles List =====
-  articlesSection: {
-    paddingHorizontal: spacing.lg,
-  },
-  articlesCount: {
-    fontSize: fontSizes.sm,
-    color: colors.textSecondary,
-    fontWeight: fontWeights.medium,
-  },
-  articleCard: {
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
-    marginBottom: spacing.md,
-    overflow: 'hidden',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-  },
-  articleAccent: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 4,
-    borderTopLeftRadius: borderRadius.lg,
-    borderBottomLeftRadius: borderRadius.lg,
-  },
-  articleInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: spacing.md,
-    paddingLeft: spacing.md + 4,
-    gap: spacing.md,
-  },
-  articleIconBox: {
-    width: 56,
-    height: 56,
-    borderRadius: borderRadius.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  articleIconText: {
-    fontSize: 26,
-  },
-  articleTextContent: {
+  signText: {
     flex: 1,
-  },
-  articleCategoryTag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    marginBottom: spacing.xs,
-  },
-  articleCategoryDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  articleCategoryLabel: {
-    fontSize: fontSizes.xs,
-    fontWeight: fontWeights.semiBold,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  articleTitle: {
-    fontSize: fontSizes.md,
-    fontWeight: fontWeights.semiBold,
+    fontSize: 14,
     color: colors.text,
-    marginBottom: 4,
-    lineHeight: fontSizes.md * 1.3,
+    fontWeight: '500',
   },
-  articleSummary: {
-    fontSize: fontSizes.sm,
-    color: colors.textSecondary,
-    lineHeight: fontSizes.sm * 1.45,
-    marginBottom: spacing.sm,
-  },
-  articleFooter: {
+  alertBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    backgroundColor: '#FFEBEE',
+    margin: 16,
+    marginTop: 0,
+    padding: 12,
+    borderRadius: 12,
+    gap: 8,
   },
-  articleReadTime: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  articleReadTimeIcon: {
-    fontSize: 12,
-  },
-  articleReadTimeText: {
-    fontSize: fontSizes.xs,
-    color: colors.textLight,
-    fontWeight: fontWeights.medium,
-  },
-  articleSections: {
-    fontSize: fontSizes.xs,
-    color: colors.textLight,
-    fontWeight: fontWeights.medium,
-  },
-  articleArrowContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.background,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  articleArrow: {
-    fontSize: fontSizes.xxl,
-    fontWeight: fontWeights.bold,
+  alertText: {
+    flex: 1,
+    color: '#C62828',
+    fontSize: 13,
+    fontWeight: '700',
   },
 
-  // ===== Empty State =====
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: spacing.xxl,
-    paddingHorizontal: spacing.lg,
+  /* ---- Stories ---- */
+  storyItem: {
+    flexDirection: 'row',
+    padding: 16,
+    gap: 12,
   },
-  emptyIconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.primary + '10',
+  storyAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: spacing.lg,
   },
-  emptyIcon: {
-    fontSize: 36,
+  storyHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
   },
-  emptyTitle: {
-    fontSize: fontSizes.lg,
-    fontWeight: fontWeights.semiBold,
+  storyName: {
+    fontSize: 16,
+    fontWeight: '700',
     color: colors.text,
-    marginBottom: spacing.sm,
-    textAlign: 'center',
   },
-  emptySubtitle: {
-    fontSize: fontSizes.sm,
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  storyText: {
+    fontSize: 13,
     color: colors.textSecondary,
+    lineHeight: 18,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#F5F5F5',
+    marginHorizontal: 16,
+  },
+
+  /* ---- CTA ---- */
+  ctaContainer: {
+    marginHorizontal: CARD_HORIZONTAL_PAD,
+    marginTop: 32,
+    borderRadius: 24,
+    overflow: 'hidden',
+    elevation: 8,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+  },
+  ctaGradient: {
+    padding: 32,
+    alignItems: 'center',
+  },
+  ctaTitle: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#FFF',
     textAlign: 'center',
-    lineHeight: fontSizes.sm * 1.5,
-    marginBottom: spacing.lg,
+    marginBottom: 8,
   },
-  emptyButton: {
-    backgroundColor: colors.primary,
-    borderRadius: borderRadius.round,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm + 2,
-    minHeight: MIN_TOUCH_TARGET,
-    justifyContent: 'center',
+  ctaSubtitle: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.9)',
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 20,
   },
-  emptyButtonText: {
-    fontSize: fontSizes.md,
-    fontWeight: fontWeights.semiBold,
-    color: colors.textOnPrimary,
+  ctaButton: {
+    backgroundColor: '#FFF',
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  ctaButtonText: {
+    color: colors.primary,
+    fontSize: 16,
+    fontWeight: '700',
   },
 });
