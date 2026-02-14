@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "Sehatik - صحتك",
+    "slug": "sehatik",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F8F9FA"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "ma.sehatik.app",
+      "infoPlist": {
+        "CFBundleAllowMixedLocalizations": true
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#F8F9FA"
+      },
+      "package": "ma.sehatik.app",
+      "edgeToEdgeEnabled": true,
+      "supportsRTL": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "locales": {
+      "fr": "./src/infrastructure/i18n/locales/fr.json",
+      "ar": "./src/infrastructure/i18n/locales/ar.json"
+    },
+    "plugins": [
+      [
+        "expo-localization"
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id-here"
+      }
+    }
+  }
+}

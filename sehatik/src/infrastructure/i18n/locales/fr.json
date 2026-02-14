@@ -1,0 +1,595 @@
+{
+  "common": {
+    "appName": "Sehatik",
+    "appTagline": "Votre compagnon santé",
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "retry": "Réessayer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "done": "Terminé",
+    "close": "Fermer",
+    "search": "Rechercher",
+    "yes": "Oui",
+    "no": "Non",
+    "ok": "OK"
+  },
+  "disclaimer": {
+    "general": "Cette application ne remplace pas un avis médical professionnel. Consultez toujours un médecin pour toute préoccupation.",
+    "assessment": "Cet outil aide à la sensibilisation, mais seul un professionnel de santé peut poser un diagnostic.",
+    "title": "Avertissement médical"
+  },
+  "tabs": {
+    "home": "Accueil",
+    "autopalpation": "Auto-examen",
+    "chat": "Assistant",
+    "education": "Apprendre",
+    "profile": "Profil"
+  },
+  "home": {
+    "welcome": "Bienvenue sur Sehatik",
+    "welcomeBack": "Bon retour, {{name}}",
+    "subtitle": "Votre santé mammaire, notre priorité",
+    "quickActions": "Actions rapides",
+    "yourHealth": "Votre santé",
+    "startExam": "Commencer l'auto-examen",
+    "askQuestion": "Poser une question",
+    "findCenter": "Trouver un centre de dépistage",
+    "nextReminder": "Prochain rappel",
+    "lastExam": "Dernier examen",
+    "daysAgo": "il y a {{count}} jours",
+    "neverDone": "Pas encore effectué",
+    "healthTip": "Conseil santé du jour",
+    "earlyDetection": "La détection précoce sauve des vies. Un examen régulier ne prend que 10 minutes.",
+    "goodMorning": "Bonjour",
+    "goodAfternoon": "Bon après-midi",
+    "goodEvening": "Bonsoir",
+    "selfExamLabel": "Auto-examen",
+    "heroCtaLabel": "Commencer",
+    "daysLabel": "jours",
+    "chatDesc": "Assistant IA confidentiel",
+    "centerDesc": "Près de chez vous",
+    "motivTitle": "Prenez soin de vous",
+    "motivSub": "Un auto-examen régulier peut sauver des vies"
+  },
+  "autopalpation": {
+    "title": "Auto-examen des seins",
+    "subtitle": "Suivez les étapes pour un examen complet",
+    "start": "Commencer l'examen",
+    "step": "Étape {{current}} sur {{total}}",
+    "visualInspection": "Inspection visuelle",
+    "palpation": "Palpation",
+    "results": "Résultats",
+    "disclaimer": "Cet examen est à titre éducatif uniquement et ne remplace pas un examen médical professionnel.",
+    "complete": "Examen terminé",
+    "scheduleReminder": "Planifier un rappel"
+  },
+  "chat": {
+    "title": "Assistant santé",
+    "subtitle": "Posez vos questions en toute confidentialité",
+    "placeholder": "Écrivez votre question...",
+    "send": "Envoyer",
+    "thinking": "En train de réfléchir...",
+    "disclaimer": "Les réponses sont à titre informatif uniquement. Consultez un médecin pour un avis professionnel.",
+    "welcome": "Bonjour ! Je suis votre assistant santé. Comment puis-je vous aider aujourd'hui ?",
+    "suggestions": {
+      "symptoms": "Quels symptômes surveiller ?",
+      "screening": "Quand faire un dépistage ?",
+      "selfExam": "Comment faire un auto-examen ?"
+    }
+  },
+  "education": {
+    "title": "Apprendre",
+    "subtitle": "Informez-vous sur la santé mammaire",
+    "categories": {
+      "title": "Catégories",
+      "all": "Tout",
+      "whatIs": "Comprendre",
+      "detection": "Dépistage",
+      "signs": "Signes",
+      "treatment": "Traitement",
+      "stories": "Témoignages",
+      "myths": "Mythes",
+      "faq": "FAQ"
+    },
+    "readMore": "Lire la suite",
+    "readArticle": "Lire",
+    "duration": "{{minutes}} min de lecture",
+    "searchPlaceholder": "Rechercher un article...",
+    "featured": "Articles recommandés",
+    "articles": "articles",
+    "topics": "sujets",
+    "languages": "langues",
+    "sections": "sections",
+    "searchResults": "Résultats de recherche",
+    "allArticles": "Tous les articles",
+    "noResults": "Aucun article trouvé",
+    "tryDifferent": "Essayez un autre terme de recherche ou changez de catégorie",
+    "showAll": "Voir tous les articles",
+    "articleNotFound": "Article introuvable",
+    "relatedArticles": "Articles similaires"
+  },
+  "profile": {
+    "title": "Mon profil",
+    "settings": "Paramètres",
+    "language": "Langue",
+    "notifications": "Notifications",
+    "privacy": "Confidentialité",
+    "screeningCenters": "Centres de dépistage",
+    "about": "À propos",
+    "help": "Aide",
+    "logout": "Déconnexion",
+    "deleteAccount": "Supprimer mon compte",
+    "deleteConfirm": "Êtes-vous sûr(e) de vouloir supprimer votre compte ? Cette action est irréversible.",
+    "version": "Version {{version}}"
+  },
+  "language": {
+    "title": "Choisir la langue",
+    "fr": "Français",
+    "ar": "العربية",
+    "darija": "الدارجة"
+  },
+  "onboarding": {
+    "welcome": "Bienvenue sur Sehatik",
+    "description": "Votre compagnon pour la santé mammaire",
+    "getStarted": "Commencer",
+    "skip": "Passer",
+    "slide1_title": "Bienvenue sur Sehatik",
+    "slide1_subtitle": "Votre compagnon pour la santé mammaire",
+    "slide2_title": "Auto-examen guidé",
+    "slide2_subtitle": "Apprenez à pratiquer l'auto-examen avec un guide étape par étape",
+    "slide3_title": "Confidentiel et sécurisé",
+    "slide3_subtitle": "Vos données sont chiffrées et restent privées",
+    "disclaimer_accept": "J'ai compris et j'accepte",
+    "disclaimer_text": "Cette application est un outil éducatif et ne remplace en aucun cas un avis médical professionnel. Consultez toujours un médecin pour toute préoccupation de santé."
+  },
+  "exam": {
+    "sections": {
+      "visual": {
+        "title": "Inspection visuelle",
+        "description": "Observez votre poitrine devant un miroir"
+      },
+      "palpation": {
+        "title": "Palpation",
+        "description": "Examinez votre poitrine par le toucher"
+      },
+      "additional": {
+        "title": "Questions supplémentaires",
+        "description": "Informations complémentaires"
+      }
+    },
+    "questions": {
+      "skin_changes": {
+        "title": "Changements de peau",
+        "description": "Avez-vous remarqué des changements de la peau du sein (rougeur, épaississement, irritation) ?"
+      },
+      "skin_dimpling": {
+        "title": "Fossettes ou creux",
+        "description": "Observez-vous des fossettes, creux ou rides inhabituels sur la peau du sein ?"
+      },
+      "peau_orange": {
+        "title": "Peau d'orange",
+        "description": "La peau a-t-elle un aspect de peau d'orange (petits trous comme une orange) ?"
+      },
+      "nipple_retraction": {
+        "title": "Rétraction du mamelon",
+        "description": "Le mamelon est-il rétracté ou tourné vers l'intérieur (s'il ne l'était pas avant) ?"
+      },
+      "nipple_discharge": {
+        "title": "Écoulement du mamelon",
+        "description": "Avez-vous remarqué un écoulement du mamelon (en dehors de l'allaitement) ?"
+      },
+      "asymmetry": {
+        "title": "Asymétrie",
+        "description": "Avez-vous remarqué un changement récent dans la forme ou la taille d'un sein ?"
+      },
+      "redness": {
+        "title": "Rougeur ou chaleur",
+        "description": "Y a-t-il une rougeur, chaleur ou gonflement inhabituel ?"
+      },
+      "lump_detected": {
+        "title": "Masse ou boule",
+        "description": "Avez-vous senti une boule, un épaississement ou une masse dans le sein ?"
+      },
+      "lump_location": {
+        "title": "Localisation de la masse",
+        "description": "Dans quelle zone du sein avez-vous senti la masse ?"
+      },
+      "lump_characteristics": {
+        "title": "Caractéristiques de la masse",
+        "description": "Comment décririez-vous la masse ?"
+      },
+      "armpit_lump": {
+        "title": "Masse sous le bras",
+        "description": "Avez-vous senti une boule ou un gonflement sous le bras (aisselle) ?"
+      },
+      "breast_pain": {
+        "title": "Douleur au sein",
+        "description": "Ressentez-vous une douleur dans le sein ?"
+      },
+      "pain_cyclic": {
+        "title": "Douleur cyclique",
+        "description": "La douleur est-elle liée à votre cycle menstruel ?"
+      },
+      "changes_recent": {
+        "title": "Changements récents",
+        "description": "Avez-vous remarqué des changements au cours des dernières semaines ?"
+      },
+      "family_history": {
+        "title": "Antécédents familiaux",
+        "description": "Y a-t-il des cas de cancer du sein dans votre famille proche ?"
+      },
+      "previous_issues": {
+        "title": "Problèmes antérieurs",
+        "description": "Avez-vous déjà eu des problèmes mammaires (biopsie, kyste, etc.) ?"
+      }
+    },
+    "quadrants": {
+      "upper_outer": "Quadrant supéro-externe",
+      "upper_inner": "Quadrant supéro-interne",
+      "lower_outer": "Quadrant inféro-externe",
+      "lower_inner": "Quadrant inféro-interne",
+      "central": "Zone centrale"
+    },
+    "lump": {
+      "hard": "Dure",
+      "soft": "Molle",
+      "mobile": "Mobile",
+      "fixed": "Fixe",
+      "painful": "Douloureuse",
+      "painless": "Indolore"
+    },
+    "answer": {
+      "yes": "Oui",
+      "no": "Non"
+    },
+    "instructions": {
+      "visual": "Placez-vous devant un miroir, bras le long du corps. Observez vos seins attentivement.",
+      "palpation": "Allongez-vous ou tenez-vous debout. Utilisez les trois doigts du milieu pour palper chaque sein en mouvements circulaires.",
+      "additional": "Quelques questions supplémentaires pour mieux vous guider."
+    }
+  },
+  "results": {
+    "title": "Résultats de l'examen",
+    "disclaimer": "Ces résultats sont à titre informatif uniquement. Seul un professionnel de santé peut poser un diagnostic.",
+    "recommendation": {
+      "urgent": "Consultation urgente recommandée",
+      "checkup": "Consultation recommandée",
+      "monitoring": "Continuez la surveillance"
+    },
+    "message": {
+      "high": "Certains signes détectés nécessitent une attention médicale rapide. Ne vous inquiétez pas, la plupart des anomalies sont bénignes, mais il est important de consulter.",
+      "moderate": "Quelques observations méritent l'attention d'un professionnel de santé. Prenez rendez-vous pour un examen de contrôle.",
+      "low": "Aucun signe préoccupant détecté. Continuez vos auto-examens mensuels et vos dépistages réguliers."
+    },
+    "steps": {
+      "consult_specialist": "Consultez un spécialiste (gynécologue ou oncologue)",
+      "within_48h": "Prenez rendez-vous dans les 48 heures",
+      "bring_notes": "Apportez les résultats de cet examen à votre médecin",
+      "dont_panic": "Ne paniquez pas - la plupart des anomalies sont bénignes",
+      "schedule_appointment": "Prenez rendez-vous avec votre médecin",
+      "within_2weeks": "Consultation dans les 2 semaines recommandée",
+      "continue_monitoring": "Continuez vos auto-examens mensuels",
+      "note_changes": "Notez tout changement que vous observez",
+      "monthly_exam": "Pratiquez l'auto-examen chaque mois",
+      "annual_screening": "Faites un dépistage annuel (mammographie après 40 ans)",
+      "know_normal": "Apprenez à connaître l'aspect normal de vos seins",
+      "stay_informed": "Restez informée sur la santé mammaire"
+    },
+    "risk_level": "Niveau de risque",
+    "score": "Score",
+    "red_flags": "Points d'attention",
+    "next_steps": "Prochaines étapes",
+    "new_exam": "Nouvel examen",
+    "find_center": "Trouver un centre",
+    "share_with_doctor": "Partager avec votre médecin"
+  },
+  "articles": {
+    "what_is_breast_cancer": {
+      "title": "Qu'est-ce que le cancer du sein ?",
+      "summary": "Comprendre les bases du cancer du sein de manière simple et claire",
+      "s1_heading": "Une explication simple",
+      "s1_body": "Le cancer du sein survient lorsque des cellules du sein se multiplient de manière anormale et incontrôlée, formant une tumeur. Ces cellules peuvent envahir les tissus voisins et, dans certains cas, se propager à d'autres parties du corps. Le sein est composé de glandes, de canaux, de tissu adipeux et de tissu conjonctif — le cancer peut se développer dans n'importe laquelle de ces structures.",
+      "s2_heading": "Un cancer fréquent, à tout âge",
+      "s2_body": "Le cancer du sein est le cancer le plus fréquent chez la femme dans le monde, y compris au Maroc. Bien qu'il soit plus courant après 50 ans, il peut toucher des femmes de tous âges, y compris des jeunes femmes. Au Maroc, l'âge moyen au diagnostic est souvent plus jeune que dans les pays occidentaux. C'est pourquoi la vigilance doit commencer tôt.",
+      "s3_heading": "Silencieux au début, mais très traitable",
+      "s3_body": "Aux stades précoces, le cancer du sein ne provoque souvent aucune douleur ni symptôme visible. C'est pourquoi il est si important de pratiquer l'auto-examen et le dépistage régulier. La bonne nouvelle : lorsqu'il est détecté tôt, le taux de guérison dépasse 90%. Un cancer pris à temps signifie un traitement plus léger, moins d'effets secondaires et une meilleure qualité de vie."
+    },
+    "early_detection": {
+      "title": "Détection précoce et dépistage",
+      "summary": "Pourquoi et comment se dépister régulièrement",
+      "s1_heading": "Pourquoi la détection précoce est essentielle",
+      "s1_body": "Détecter un cancer du sein à un stade précoce change tout : le traitement est moins lourd, les chances de guérison sont beaucoup plus élevées, et la qualité de vie est préservée. Au Maroc, beaucoup de femmes sont encore diagnostiquées à des stades avancés, souvent par manque d'information ou de dépistage. Chaque femme peut agir pour changer cela.",
+      "s2_heading": "L'auto-examen mensuel",
+      "s2_body": "L'auto-examen des seins est un geste simple que chaque femme devrait pratiquer une fois par mois, idéalement entre le 5e et le 10e jour après le début des règles. Il ne remplace pas le dépistage médical, mais il vous aide à connaître votre corps et à repérer rapidement tout changement inhabituel. Après la ménopause, choisissez un jour fixe chaque mois.",
+      "s3_heading": "Le dépistage professionnel",
+      "s3_body": "La mammographie est l'examen de référence pour détecter les anomalies avant même qu'elles soient palpables. Elle est recommandée tous les 1 à 2 ans à partir de 40 ans. L'échographie mammaire est un examen complémentaire utile, surtout pour les seins denses. Au Maroc, le programme national offre des mammographies gratuites aux femmes de 45 à 69 ans dans les centres de santé publics.",
+      "s4_heading": "Moins de traitements agressifs",
+      "s4_body": "Un cancer détecté tôt nécessite souvent une chirurgie plus limitée (conservation du sein), moins de chimiothérapie, et permet un retour plus rapide à la vie normale. La détection précoce ne sauve pas seulement des vies — elle préserve aussi la qualité de vie."
+    },
+    "early_signs": {
+      "title": "Signes d'alerte et quand consulter",
+      "summary": "Reconnaître les signes précoces et agir rapidement",
+      "s1_heading": "Les signes d'alerte à surveiller",
+      "s1_body": "Consultez un professionnel de santé si vous remarquez l'un de ces signes :\n\n• Une boule ou un épaississement dans le sein ou sous le bras\n• Un changement de taille ou de forme d'un sein\n• Une fossette, un creux ou une ride inhabituelle dans la peau\n• Une peau d'orange (aspect granuleux)\n• Une rougeur, chaleur ou gonflement persistant\n• Une rétraction du mamelon (tourné vers l'intérieur)\n• Un écoulement du mamelon (surtout s'il est sanglant)\n• Une douleur localisée persistante\n• Un changement de couleur ou de texture de la peau",
+      "s2_heading": "Quand consulter ?",
+      "s2_body": "Consultez un professionnel de santé pour tout changement nouveau ou inhabituel dans vos seins, même s'il vous semble mineur. N'attendez pas que le symptôme s'aggrave ou disparaisse de lui-même. La majorité des changements sont bénins (8 boules sur 10 ne sont pas cancéreuses), mais seul un médecin peut poser un diagnostic. Agir vite, c'est se donner les meilleures chances. Ne laissez pas la peur vous empêcher de consulter — au contraire, consultez pour être rassurée."
+    },
+    "treatment_prognosis": {
+      "title": "Traitement et pronostic",
+      "summary": "L'impact crucial de la détection précoce sur le traitement",
+      "s1_heading": "Détection précoce vs tardive : les chiffres",
+      "s1_body": "Le stade au moment du diagnostic change radicalement le pronostic :\n\n• Stade 1 (précoce) : taux de survie à 5 ans supérieur à 95%\n• Stade 2 : environ 85%\n• Stade 3 : environ 52%\n• Stade 4 (avancé) : environ 28%\n\nCes chiffres montrent clairement que chaque mois gagné dans le diagnostic peut faire une différence vitale.",
+      "s2_heading": "Diagnostic tardif = traitement plus lourd",
+      "s2_body": "Lorsque le cancer est détecté tardivement, le traitement est souvent plus agressif : mastectomie totale (ablation complète du sein), chimiothérapie intensive, radiothérapie prolongée, et parfois des traitements combinés. Cela signifie plus d'effets secondaires, une convalescence plus longue, et un impact plus important sur le quotidien et le bien-être émotionnel.",
+      "s3_heading": "Détecté tôt = meilleure qualité de vie",
+      "s3_body": "Un cancer découvert à un stade précoce permet souvent une chirurgie conservatrice (on retire la tumeur en préservant le sein), moins de chimiothérapie ou une chimiothérapie plus légère, et un retour plus rapide à la vie normale. Les femmes diagnostiquées tôt ont non seulement de meilleures chances de survie, mais aussi une bien meilleure qualité de vie pendant et après le traitement."
+    },
+    "real_stories": {
+      "title": "Histoires vraies",
+      "summary": "Des témoignages qui montrent l'importance de l'action précoce",
+      "s1_heading": "Fatima, 42 ans — détectée à temps",
+      "s1_body": "Fatima pratiquait l'auto-examen chaque mois. Un jour, elle a senti une petite boule inhabituelle. Sans attendre, elle a consulté son médecin qui a prescrit une mammographie. Le diagnostic : un cancer de stade 1, très localisé. Grâce à cette détection précoce, Fatima a bénéficié d'une chirurgie conservatrice et d'un traitement léger. Aujourd'hui, elle est en pleine forme et encourage toutes les femmes autour d'elle à se faire dépister. « Si j'avais attendu, l'histoire aurait pu être très différente », dit-elle.",
+      "s2_heading": "Khadija, 55 ans — un diagnostic retardé",
+      "s2_body": "Khadija avait remarqué un changement dans son sein depuis plusieurs mois, mais la peur et la honte l'ont empêchée de consulter. Quand elle s'est finalement rendue chez le médecin, le cancer était à un stade avancé. Elle a dû subir une mastectomie complète et une chimiothérapie lourde. « Je regrette d'avoir attendu. Si j'avais su que le dépistage précoce existait et qu'il était accessible, j'aurais agi plus tôt », témoigne-t-elle. Son histoire rappelle que le temps est précieux.",
+      "s3_heading": "Votre histoire peut être différente",
+      "s3_body": "Ces témoignages ne sont pas là pour faire peur, mais pour montrer que l'action précoce fait toute la différence. Chaque femme a le pouvoir de prendre sa santé en main. L'auto-examen, le dépistage régulier et la consultation rapide en cas de doute sont vos meilleurs alliés. Vous méritez de prendre soin de vous, et il n'est jamais trop tôt pour commencer."
+    },
+    "myths_beliefs": {
+      "title": "Mythes et fausses croyances",
+      "summary": "Corriger les idées reçues sur le cancer du sein",
+      "s1_heading": "Les idées fausses les plus courantes",
+      "s1_body": "« Le cancer du sein ne touche que les femmes âgées »\nFaux — Il peut survenir à tout âge, même chez les jeunes femmes.\n\n« Si personne dans ma famille n'a eu le cancer, je ne risque rien »\nFaux — 85% des cas surviennent chez des femmes sans antécédents familiaux.\n\n« Une boule dans le sein signifie forcément un cancer »\nFaux — 80% des boules sont bénignes (kystes, fibroadénomes).\n\n« La mammographie est dangereuse à cause des radiations »\nFaux — La dose de radiation est très faible et le bénéfice du dépistage dépasse largement le risque.",
+      "s2_heading": "D'autres croyances à corriger",
+      "s2_body": "« Porter un soutien-gorge serré cause le cancer du sein »\nFaux — Aucune étude scientifique n'a prouvé ce lien.\n\n« Le cancer du sein est une condamnation à mort »\nFaux — Détecté tôt, le taux de guérison dépasse 90%.\n\n« Seules les femmes peuvent avoir le cancer du sein »\nFaux — Les hommes peuvent aussi développer un cancer du sein, bien que ce soit rare.\n\n« Parler du cancer du sein porte malheur »\nFaux — En parler ouvertement sauve des vies en encourageant le dépistage.",
+      "s3_heading": "Dépasser la peur et la stigmatisation",
+      "s3_body": "Dans certaines cultures, le cancer est entouré de tabou et de honte. Beaucoup de femmes retardent leur consultation par peur du diagnostic ou du regard des autres. Pourtant, le savoir est une force. Comprendre la maladie réduit la peur et permet d'agir. Le cancer du sein n'est ni une punition ni une fatalité. C'est une maladie qui se soigne, surtout quand elle est prise en charge tôt. Parlez-en, informez-vous, et n'hésitez jamais à consulter."
+    },
+    "faq": {
+      "title": "Questions fréquentes",
+      "summary": "Réponses claires aux questions les plus courantes",
+      "s1_heading": "Questions sur le cancer du sein",
+      "s1_body": "Q : À quel âge commencer le dépistage ?\nR : L'auto-examen dès 25 ans, la mammographie à partir de 40 ans (ou plus tôt si antécédents familiaux).\n\nQ : L'auto-examen peut-il remplacer la mammographie ?\nR : Non. L'auto-examen est complémentaire mais ne détecte pas les micro-tumeurs. La mammographie reste indispensable.\n\nQ : Est-ce que la douleur au sein signifie un cancer ?\nR : Rarement. La plupart des douleurs mammaires sont liées au cycle hormonal et sont bénignes.",
+      "s2_heading": "Questions sur le dépistage",
+      "s2_body": "Q : La mammographie est-elle douloureuse ?\nR : Elle peut être inconfortable mais dure moins de 15 minutes. Planifiez-la en dehors de la période des règles pour moins de sensibilité.\n\nQ : Le dépistage est-il gratuit au Maroc ?\nR : Oui, le programme national offre des mammographies gratuites aux femmes de 45 à 69 ans dans les centres de santé publics et les centres de la Fondation Lalla Salma.\n\nQ : À quelle fréquence faire une mammographie ?\nR : Tous les 1 à 2 ans à partir de 40 ans, ou selon les recommandations de votre médecin si vous avez des facteurs de risque.",
+      "s3_heading": "Questions pratiques",
+      "s3_body": "Q : Que faire si je trouve une boule ?\nR : Consultez un médecin rapidement. Ne paniquez pas — 8 boules sur 10 sont bénignes. Mais seul un professionnel peut vous rassurer.\n\nQ : Puis-je me faire dépister pendant la grossesse ?\nR : L'auto-examen est possible. Pour la mammographie, informez votre médecin de votre grossesse.\n\nQ : Comment prendre soin de ma santé mammaire au quotidien ?\nR : Pratiquez l'auto-examen mensuel, maintenez une alimentation saine, faites de l'exercice régulièrement et consultez pour vos dépistages prévus."
+    }
+  },
+  "auth": {
+    "phone_title": "Connexion",
+    "phone_subtitle": "Entrez votre numéro de téléphone",
+    "phone_placeholder": "+212 6XX XXX XXX",
+    "send_otp": "Envoyer le code",
+    "otp_title": "Vérification",
+    "otp_subtitle": "Entrez le code reçu par SMS",
+    "otp_placeholder": "Code à 6 chiffres",
+    "verify": "Vérifier",
+    "resend": "Renvoyer le code",
+    "skip": "Continuer sans compte",
+    "error_invalid": "Code invalide",
+    "error_send": "Erreur d'envoi du code"
+  },
+  "screening": {
+    "title": "Centres de dépistage",
+    "subtitle": "Trouvez un centre près de chez vous",
+    "search_placeholder": "Rechercher une ville...",
+    "filter_all": "Tous",
+    "filter_public": "Public",
+    "filter_private": "Privé",
+    "filter_ngo": "Association",
+    "free_mammography": "Mammographie gratuite",
+    "services": "Services",
+    "call": "Appeler",
+    "directions": "Itinéraire",
+    "no_results": "Aucun centre trouvé",
+    "centers_count": "{{count}} centres trouvés"
+  },
+  "nearby": {
+    "title": "Centres à proximité",
+    "subtitle": "Triés par distance depuis votre position",
+    "your_location": "Votre position",
+    "loading_location": "Localisation en cours...",
+    "filter_all": "Tous",
+    "type_public": "Hôpital",
+    "type_private": "Clinique privée",
+    "type_ngo": "Association",
+    "type_caravan": "Caravane",
+    "all_services": "Tous les services",
+    "caravan_alert": "Caravane médicale à proximité !",
+    "active_now": "En cours",
+    "free": "Gratuit"
+  },
+  "notifications": {
+    "title": "Rappels",
+    "monthly_exam": "Rappel mensuel d'auto-examen",
+    "yearly_screening": "Rappel annuel de mammographie",
+    "enabled": "Activé",
+    "disabled": "Désactivé",
+    "day_of_month": "Jour du mois",
+    "time": "Heure",
+    "next_reminder": "Prochain rappel : {{date}}"
+  },
+  "selfCheck": {
+    "title": "Auto-examen guidé",
+    "subtitle": "Un guide interactif étape par étape pour l'auto-examen des seins",
+    "lastCheck": "Dernier auto-examen",
+    "stepsOverview": "Les étapes de l'examen",
+    "startButton": "Commencer l'auto-examen",
+    "answerQuestions": "Répondre aux questions",
+    "nextStep": "Étape suivante",
+    "unsure": "Pas sûre",
+    "unsureHint": "Si vous n'êtes pas sûre, ce n'est pas grave. Notez-le et surveillez l'évolution. En cas de doute, consultez un professionnel de santé.",
+    "steps": {
+      "visual": {
+        "title": "Examen visuel",
+        "description": "Observez votre poitrine devant un miroir pour détecter toute asymétrie, fossette, rougeur ou modification du mamelon.",
+        "instructions": {
+          "mirror": "Placez-vous debout devant un miroir bien éclairé, la poitrine découverte.",
+          "armsSides": "Bras le long du corps : observez la forme, la taille et la symétrie de vos seins. Recherchez toute fossette, creux ou rougeur.",
+          "handsHips": "Mains sur les hanches : contractez les muscles de la poitrine et observez à nouveau les mêmes zones.",
+          "armsRaised": "Bras levés au-dessus de la tête : vérifiez si les seins se soulèvent de façon symétrique. Observez le dessous des seins."
+        },
+        "questions": {
+          "skinChanges": "Avez-vous remarqué des changements cutanés par rapport au mois dernier (rougeur, fossette, épaississement) ?",
+          "nippleChanges": "Avez-vous remarqué des modifications du mamelon ou un écoulement ?"
+        }
+      },
+      "palpation": {
+        "title": "Palpation",
+        "description": "Examinez chaque sein par le toucher pour détecter toute masse, épaississement ou zone sensible.",
+        "instructions": {
+          "fingerPads": "Utilisez les pulpes de vos trois doigts du milieu (pas le bout des doigts).",
+          "circularMotion": "Palpez chaque zone du sein avec de petits mouvements circulaires. Variez la pression : légère, moyenne puis ferme.",
+          "armpit": "N'oubliez pas d'examiner la zone sous le bras (aisselle) où se trouvent les ganglions lymphatiques.",
+          "standing": "Debout ou sous la douche : palpez chaque sein pour vérifier les tissus superficiels.",
+          "lying": "Allongée avec un coussin sous l'épaule : examinez le sein opposé pour atteindre les tissus profonds.",
+          "repeat": "Répétez l'ensemble de la palpation pour l'autre sein."
+        },
+        "questions": {
+          "lump": "Avez-vous senti une masse, une boule ou un épaississement ?",
+          "pain": "Avez-vous ressenti une douleur ou une sensibilité ?",
+          "changes": "Avez-vous remarqué des changements par rapport au mois dernier ?"
+        }
+      },
+      "nipple": {
+        "title": "Vérification du mamelon",
+        "description": "Examinez vos mamelons pour détecter tout écoulement ou changement d'apparence.",
+        "instructions": {
+          "squeeze": "Pressez doucement chaque mamelon entre le pouce et l'index pour vérifier s'il y a un écoulement.",
+          "observe": "Observez l'aspect du mamelon : rétraction, croûte, changement de couleur ou de direction."
+        },
+        "questions": {
+          "discharge": "Avez-vous observé un écoulement du mamelon (en dehors de l'allaitement) ?",
+          "appearance": "Avez-vous remarqué un changement d'apparence du mamelon (rétraction, croûte, rougeur) ?"
+        }
+      }
+    },
+    "chat": {
+      "continue": "Continuer",
+      "backToInstructions": "Revoir les instructions",
+      "askQuestion": "Poser une question",
+      "clarifyPlaceholder": "Posez votre question ici...",
+      "disclaimer": "Rappel : ceci est un outil de sensibilisation et ne remplace pas un avis médical professionnel.",
+      "visual": {
+        "greeting": "Très bien, vous avez terminé l'inspection visuelle ! Laissez-moi vous poser quelques questions sur ce que vous avez observé.",
+        "q_skinChanges": "Avez-vous remarqué des changements cutanés par rapport au mois dernier ?",
+        "skinYesAck": "Merci de le signaler. Pouvez-vous préciser ce que vous avez observé ? Cela m'aidera à mieux vous guider.",
+        "q_skinType": "Lequel de ces changements décrit le mieux ce que vous avez vu ?",
+        "opt_redness": "Rougeur",
+        "opt_dimpling": "Fossette / creux",
+        "opt_thickening": "Épaississement",
+        "opt_peauOrange": "Peau d'orange",
+        "opt_other": "Autre",
+        "skinUnsureHelp": "Pas de souci ! Voici ce qu'il faut rechercher : une fossette ressemble à un petit creux dans la peau. La peau d'orange donne un aspect granuleux comme la peau d'une orange. Une rougeur persistante peut aussi être un signe à noter.",
+        "q_skinRecheck": "Après cette description, pensez-vous avoir remarqué quelque chose ?",
+        "opt_seeSomething": "Oui, je vois quelque chose",
+        "opt_looksNormal": "Non, tout semble normal",
+        "opt_stillUnsure": "Toujours pas sûre",
+        "skinNoAck": "Très bien, c'est rassurant. Passons à la question suivante.",
+        "q_nippleChanges": "Avez-vous remarqué des modifications du mamelon ou un écoulement ?",
+        "nippleYesAck": "Merci de le mentionner. Pouvez-vous préciser le type de changement ?",
+        "q_nippleType": "Quel type de changement avez-vous observé ?",
+        "opt_retraction": "Rétraction du mamelon",
+        "opt_discharge": "Écoulement",
+        "opt_colorChange": "Changement de couleur",
+        "opt_crusting": "Croûtes",
+        "nippleUnsureHelp": "Si vous n'êtes pas certaine, comparez les deux mamelons. Recherchez toute différence de forme, direction, ou un écoulement spontané.",
+        "nippleNoAck": "Parfait, c'est noté.",
+        "closing": "Excellent travail ! Vous avez terminé l'examen visuel. Passons maintenant à la palpation."
+      },
+      "palpation": {
+        "greeting": "Vous avez bien suivi les instructions de palpation ! Maintenant, parlons de ce que vous avez ressenti.",
+        "q_lump": "Avez-vous senti une masse, une boule ou un épaississement ?",
+        "lumpYesAck": "Merci de le signaler. Ne vous inquiétez pas, la majorité des masses sont bénignes. Quelques précisions vont m'aider à mieux vous guider.",
+        "q_lumpLocation": "Dans quelle zone avez-vous senti cette masse ?",
+        "opt_upperOuter": "Quadrant supéro-externe",
+        "opt_upperInner": "Quadrant supéro-interne",
+        "opt_lowerOuter": "Quadrant inféro-externe",
+        "opt_lowerInner": "Quadrant inféro-interne",
+        "opt_central": "Zone centrale",
+        "opt_armpit": "Sous le bras (aisselle)",
+        "q_lumpFeel": "Comment décririez-vous cette masse au toucher ?",
+        "opt_hard": "Dure",
+        "opt_soft": "Molle",
+        "opt_mobile": "Mobile (bouge)",
+        "opt_fixed": "Fixe (ne bouge pas)",
+        "lumpUnsureHelp": "Si vous n'êtes pas certaine, réessayez en variant la pression. Une masse se distingue souvent du reste du tissu par sa fermeté ou sa forme distincte.",
+        "lumpNoAck": "Très bien, c'est rassurant.",
+        "q_pain": "Avez-vous ressenti une douleur ou une sensibilité ?",
+        "painYesAck": "La douleur mammaire est très fréquente et souvent liée au cycle hormonal. Une petite question pour mieux comprendre :",
+        "q_painCyclic": "La douleur est-elle liée à votre cycle menstruel (apparaît avant les règles) ?",
+        "painNoAck": "Très bien, noté.",
+        "q_changes": "Avez-vous remarqué des changements par rapport au mois dernier ?",
+        "changesYesAck": "Merci de le noter. Il est important de signaler tout changement à votre médecin lors de votre prochaine consultation.",
+        "changesNoAck": "C'est une bonne nouvelle. La constance est rassurante.",
+        "closing": "Très bien ! Plus qu'une dernière étape : la vérification du mamelon."
+      },
+      "nipple": {
+        "greeting": "Dernière étape ! Parlons de ce que vous avez observé lors de la vérification du mamelon.",
+        "q_discharge": "Avez-vous observé un écoulement du mamelon ?",
+        "dischargeYesAck": "Merci de le mentionner. Un écoulement peut avoir différentes causes, souvent bénignes. Pouvez-vous préciser ?",
+        "q_dischargeType": "De quelle couleur était l'écoulement ?",
+        "opt_clear": "Transparent",
+        "opt_milky": "Laiteux / blanc",
+        "opt_bloody": "Sanglant / rosé",
+        "opt_otherColor": "Autre couleur",
+        "dischargeNoAck": "Parfait, c'est noté.",
+        "q_appearance": "Avez-vous remarqué un changement d'apparence du mamelon (rétraction, croûte, rougeur) ?",
+        "appearanceYesAck": "Merci de le signaler. Ces changements méritent d'être mentionnés à votre médecin.",
+        "appearanceNoAck": "Très bien, tout semble normal.",
+        "closing": "Bravo, vous avez terminé l'auto-examen complet ! Voyons maintenant vos résultats."
+      }
+    },
+    "clarify": {
+      "generic": "C'est une bonne question ! Je vous conseille de consulter la section Éducation de l'application pour plus de détails, ou de poser cette question à votre médecin lors de votre prochaine visite. Rappel : ceci est un outil de sensibilisation uniquement.",
+      "visual": {
+        "dimpling": "Une fossette ressemble à un petit creux ou renfoncement dans la peau du sein, similaire à une empreinte de pouce. Elle peut être plus visible lorsque vous levez les bras. C'est un signe à noter et à mentionner à votre médecin.",
+        "peauOrange": "La peau d'orange donne à la peau un aspect granuleux avec de petits trous, comme la surface d'une orange. C'est causé par un gonflement qui tire sur les points d'attache de la peau. Si vous observez cet aspect, consultez votre médecin.",
+        "redness": "Une rougeur persistante sur le sein peut apparaître comme une zone rosée ou rouge qui ne disparaît pas. Elle peut être accompagnée de chaleur. Si elle persiste plus de quelques jours, consultez votre médecin.",
+        "asymmetry": "Une certaine asymétrie entre les deux seins est tout à fait normale. Ce qu'il faut surveiller, c'est un changement récent de taille ou de forme d'un sein par rapport à l'autre.",
+        "nipple": "Vérifiez si le mamelon s'est rétracté (tourné vers l'intérieur) alors qu'il ne l'était pas avant. Comparez les deux mamelons pour détecter toute différence récente.",
+        "howToLook": "Placez-vous devant un miroir bien éclairé. Regardez d'abord bras le long du corps, puis mains sur les hanches, puis bras levés. Observez la forme, la taille, la symétrie et toute anomalie de la peau."
+      },
+      "palpation": {
+        "lump": "Une masse se distingue du tissu normal par sa fermeté et sa forme distincte. Elle peut être ronde, ovale ou irrégulière. La majorité des masses sont bénignes (kystes, fibroadénomes). Seul un médecin peut déterminer leur nature.",
+        "pain": "La douleur mammaire est très courante et souvent liée aux hormones. Une douleur cyclique (avant les règles) est généralement bénigne. Une douleur localisée persistante mérite d'être mentionnée à votre médecin.",
+        "pressure": "Utilisez trois niveaux de pression : légère (surface), moyenne (milieu du tissu) et ferme (près des côtes). Chaque niveau permet de sentir différentes couches de tissu.",
+        "armpit": "L'aisselle contient des ganglions lymphatiques. Palpez cette zone avec les doigts à plat en mouvements circulaires. Un ganglion gonflé peut ressembler à une petite boule ferme.",
+        "technique": "Utilisez les pulpes de vos trois doigts du milieu. Faites de petits cercles en couvrant toute la surface du sein, du bord extérieur vers le mamelon. Variez la pression à chaque passage.",
+        "lying": "Allongez-vous sur le dos avec un coussin sous l'épaule du côté examiné. Cela étale le tissu mammaire et facilite la palpation des couches profondes."
+      },
+      "nipple": {
+        "discharge": "Un écoulement du mamelon peut être transparent, laiteux, jaune ou sanglant. Un écoulement spontané (sans pression) d'un seul côté mérite d'être signalé à votre médecin.",
+        "bloody": "Un écoulement sanglant ou rosé du mamelon doit être mentionné à votre médecin rapidement. Il a souvent des causes bénignes (papillome intracanalaire) mais nécessite un examen.",
+        "howToSqueeze": "Placez le pouce et l'index autour de la base du mamelon. Pressez doucement et observez si un liquide apparaît. Ne forcez pas - un léger mouvement suffit.",
+        "crusting": "Des croûtes ou squames sur le mamelon peuvent apparaître comme des petites pellicules sèches. Si elles persistent et ne guérissent pas, mentionnez-le à votre médecin."
+      }
+    },
+    "result": {
+      "title": "Résultats de l'auto-examen",
+      "score": "Score",
+      "concerns": "Points d'attention",
+      "nextSteps": "Prochaines étapes",
+      "newCheck": "Nouvel auto-examen",
+      "recommendation": {
+        "urgent": "Consultation urgente recommandée",
+        "checkup": "Consultation recommandée",
+        "monitoring": "Continuez la surveillance"
+      },
+      "message": {
+        "high": "Certains signes détectés nécessitent une attention médicale rapide. Ne vous inquiétez pas, la plupart des anomalies sont bénignes, mais il est important de consulter un professionnel.",
+        "moderate": "Quelques observations méritent l'attention d'un professionnel de santé. Prenez rendez-vous pour un examen de contrôle.",
+        "low": "Aucun signe préoccupant détecté. Continuez vos auto-examens mensuels et restez attentive à tout changement."
+      },
+      "steps": {
+        "monthlyExam": "Pratiquez l'auto-examen chaque mois, idéalement entre le 5e et le 10e jour du cycle.",
+        "consultDoctor": "En cas de doute, prenez rendez-vous avec votre médecin ou gynécologue.",
+        "noteChanges": "Notez tout changement que vous observez d'un mois à l'autre."
+      }
+    }
+  }
+}
