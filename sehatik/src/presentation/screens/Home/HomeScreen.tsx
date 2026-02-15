@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import LottieView from 'lottie-react-native';
 import { MedicalDisclaimer } from '../../components/common/MedicalDisclaimer';
 import { useLanguageStore } from '../../../application/store/languageStore';
 import { useExamStore } from '../../../application/store/examStore';
@@ -256,6 +257,15 @@ export const HomeScreen: React.FC<Props> = ({
                   <View style={s.meshCircle1} />
                   <View style={s.meshCircle2} />
                   <View style={s.meshCircle3} />
+
+                  {/* Lottie Background Animation */}
+                  <LottieView
+                    source={require('../../../../assets/Breast Cancer Awareness Month.json')}
+                    autoPlay
+                    loop
+                    speed={0.6}
+                    style={s.heroLottie}
+                  />
 
                   <View style={[s.heroContent, isRTL && s.heroContentRTL]}>
                     <View style={s.heroLeft}>
@@ -698,6 +708,14 @@ const s = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  heroLottie: {
+    position: 'absolute',
+    top: -20,
+    right: -20,
+    width: 220,
+    height: 220,
+    opacity: 0.25,
   },
 
   heroContent: {

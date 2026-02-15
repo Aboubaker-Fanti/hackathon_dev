@@ -14,9 +14,9 @@ import {
   FlatList,
   StyleSheet,
   Linking,
-  ActivityIndicator,
   ScrollView,
 } from 'react-native';
+import LottieView from 'lottie-react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguageStore } from '../../../application/store/languageStore';
@@ -345,7 +345,13 @@ export const NearbySearchScreen: React.FC<Props> = ({ onBack }) => {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
+          <LottieView
+            source={require('../../../../assets/Dove with Pink Ribbon.json')}
+            autoPlay
+            loop
+            speed={0.8}
+            style={styles.loadingLottie}
+          />
           <Text style={styles.loadingText}>{t('nearby.loading_location')}</Text>
         </View>
       </SafeAreaView>
@@ -386,7 +392,7 @@ export const NearbySearchScreen: React.FC<Props> = ({ onBack }) => {
                 {isArabicLang ? location.labelAr : location.label}
               </Text>
             </View>
-           
+
           </View>
         </View>
       )}
@@ -491,6 +497,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: spacing.md,
+  },
+  loadingLottie: {
+    width: 200,
+    height: 200,
   },
   loadingText: {
     fontSize: fontSizes.md,
