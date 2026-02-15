@@ -181,8 +181,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopColor: '#F1F5F9',
     borderTopWidth: 1,
-    height: Platform.OS === 'ios' ? 88 : 68,
+    height: Platform.OS === 'ios' ? 88 : 96,
     paddingTop: 6,
+    paddingBottom: Platform.OS === 'ios' ? 0 : 24,
     ...Platform.select({
       ios: {
         shadowColor: 'rgba(0,0,0,0.06)',
@@ -197,7 +198,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
     letterSpacing: 0.1,
-    marginBottom: Platform.OS === 'ios' ? 0 : 8,
+    marginBottom: Platform.OS === 'ios' ? 0 : 4,
   },
   tabBarItem: {
     minHeight: MIN_TOUCH_TARGET,
